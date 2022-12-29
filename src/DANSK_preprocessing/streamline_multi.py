@@ -9,7 +9,7 @@ from spacy.training.corpus import Corpus
 
 
 # Change cwd
-os.chdir("/Users/emiltrencknerjessen/Desktop/priv/masters_thesis")
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 # Load language object
 nlp = dacy.load("medium")
@@ -128,6 +128,3 @@ docs_multiple_raters
 
 # Define a function for overwriting annotations with frequent annotations for a doc
 def overwrite_freq_ents(doc, unique_ents, unique_ents_ratio, threshold):
-    
-    
-    

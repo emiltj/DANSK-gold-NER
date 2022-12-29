@@ -11,7 +11,7 @@ import json
 
 
 # Change cwd
-os.chdir("/Users/emiltrencknerjessen/Desktop/priv/masters_thesis")
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 
 # Load language object
