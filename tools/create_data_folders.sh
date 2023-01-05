@@ -1,3 +1,4 @@
+mkdir data
 for data_size in full multi single
 do
     mkdir ./data/DANSK-$data_size/

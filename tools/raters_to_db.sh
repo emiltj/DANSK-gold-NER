@@ -4,6 +4,8 @@ do
         p) parent_dir=${OPTARG};;
         d) dir=${OPTARG};;
         o) original=${OPTARG};;
+        ?) echo "script usage: [-p] [-d] [-o]" >&2
+        exit 1
     esac
 done
 
