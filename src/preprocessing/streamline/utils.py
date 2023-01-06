@@ -250,7 +250,7 @@ def retrieve_freq_and_infreq_ents_from_doc(
     )
 
     # If infrequent entities take up the same span, delete them from the infrequent entities list
-    # This is in order to avoid deleting e.g. entities [dkpol, #dkpol], although they both might have ratios below the threshold.
+    # This is in order to avoid deleting e.g. entities [dkpol, #dkpol]. Individually their ratios may be below threshold, but above if combined.
     same_span_ents = get_same_span_ents(infreq_unique_ents_partial_match)
     for ent in same_span_ents:
         if ent in infreq_unique_ents_partial_match:
@@ -275,15 +275,45 @@ def retrieve_freq_and_infreq_ents_from_doc(
     # Retrieve a list of ents that occupy the span of other ents
     unique_ents_full_match_same_span = get_same_span_ents(freq_unique_ents_full_match)
 
+    # print(f"freq_ents: {freq_unique_ents_full_match}")
+    # print(f"freq_ents_full_match_same_span: {unique_ents_full_match_same_span}")
+
     # Retrieve a list of indexes of same span ents
     unique_ents_full_match_same_span_indexes = [
         unique_ents_full_match.index(ent) for ent in unique_ents_full_match_same_span
     ]
 
+    # print(f"indexes of same span ents: {unique_ents_full_match_same_span_indexes}")
+
+    # If there are exactly 2 frequent entities that overlap in span, only keep the most frequent. If both equally, delete both
+    if len(unique_ents_full_match_same_span_indexes) == 2:
+        # print("exactly 2 span indexes")
+        if (
+            unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[0]]
+            > unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[1]]
+        ):
+            del freq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[1]]
+            # print("one ratio is larger than the other")
+        elif (
+            unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[0]]
+            < unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[1]]
+        ):
+            del freq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[0]]
+            # print("one ratio is larger than the other")
+        elif (
+            unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[0]]
+            == unique_ents_full_match_ratio[unique_ents_full_match_same_span_indexes[1]]
+        ):
+            # print("the ratio of these two are the same")
+            for idx in sorted(unique_ents_full_match_same_span_indexes, reverse=True):
+                del freq_unique_ents_full_match[idx]
+
+    # Else:
     # Remove ents that span the same as other spans from the list of frequent entities
     # This is done to avoid having to deal with choosing which entity to keep in cases of conflict
-    for idx in sorted(unique_ents_full_match_same_span_indexes, reverse=True):
-        del freq_unique_ents_full_match[idx]
+    else:
+        for idx in sorted(unique_ents_full_match_same_span_indexes, reverse=True):
+            del freq_unique_ents_full_match[idx]
 
     return (
         unique_ents_full_match,

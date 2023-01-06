@@ -1,26 +1,27 @@
 mkdir data
 for data_size in full multi single
 do
-    mkdir ./data/DANSK-$data_size/
-    for data_format in unprocessed streamlined gold-standard
+    mkdir ./data/$data_size/
+    for data_format in unprocessed streamlined gold
     do 
-       mkdir ./data/DANSK-$data_size/$data_format/
+       mkdir ./data/$data_size/$data_format/
        for i in {1..10}
        do
-            mkdir ./data/DANSK-$data_size/$data_format/rater_$i
+            mkdir ./data/$data_size/$data_format/rater_$i
         done
     done
         for i in {1..10}
     do
-        rm -rf ./data/DANSK-$data_size/gold-standard/*
+        rm -rf ./data/$data_size/gold/*
     done
 done
 
-mkdir ./data/DANSK-single/unprocessed/model_predictions/
+mkdir ./data/multi/gold/output/
+mkdir ./data/single/gold/combined/
 
 for i in {1..10}
 do
-    mkdir ./data/DANSK-single/gold-standard/rater_$i/
+    mkdir ./data/single/gold/rater_$i/
 done
 
-rm -r ./data/DANSK-full/streamlined/
+rm -r ./data/full/streamlined/

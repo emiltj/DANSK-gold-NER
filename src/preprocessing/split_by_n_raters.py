@@ -12,9 +12,9 @@ os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 nlp = dacy.load("medium")
 
 # List relevant data and sort by rater number
-data_paths = glob.glob("./data/DANSK-full/unprocessed/rater*/train.spacy")
+data_paths = glob.glob("./data/full/unprocessed/rater*/train.spacy")
 data_paths.sort()
-data_paths.sort(key="./data/DANSK-full/unprocessed/rater_10/train.spacy".__eq__)
+data_paths.sort(key="./data/full/unprocessed/rater_10/train.spacy".__eq__)
 print("\n\nReading in data")
 
 # Load in data and get rater indices (if not already loaded)
@@ -79,7 +79,7 @@ for rater in raters:
     print(f"Saving docs that have been annotated by rater_{rater}, exclusively ...")
     for doc in single_docs_for_rater:
         db_single.add(doc)
-    db_single.to_disk(f"./data/DANSK-single/unprocessed/rater_{rater+1}/data.spacy")
+    db_single.to_disk(f"./data/single/unprocessed/rater_{rater+1}/data.spacy")
 
     # Saving multiple_docs_for_rater
     db_multi = DocBin(store_user_data=True)
@@ -88,6 +88,6 @@ for rater in raters:
     )
     for doc in multiple_docs_for_rater:
         db_multi.add(doc)
-    db_multi.to_disk(f"./data/DANSK-multi/unprocessed/rater_{rater+1}/data.spacy")
+    db_multi.to_disk(f"./data/multi/unprocessed/rater_{rater+1}/data.spacy")
 
 print("\n\n Data has been split successfully")

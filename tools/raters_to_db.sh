@@ -25,4 +25,6 @@ then
         echo "Exporting rater_$i data to Prodigy database from ./data/$parent_dir/$dir/* ..."
         prodigy db-in rater_"$i" ./data/$parent_dir/$dir/rater_$i/data.jsonl
     done
+rm -r data/prodigy_exports
+rm data/prodigy_exports.zip
 fi
