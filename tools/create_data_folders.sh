@@ -16,6 +16,7 @@ do
     done
 done
 
+mkdir ./data/single/unprocessed/combined
 mkdir ./data/multi/gold/output/
 mkdir ./data/single/gold/combined/
 
