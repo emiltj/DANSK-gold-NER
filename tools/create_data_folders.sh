@@ -17,12 +17,16 @@ do
 done
 
 mkdir ./data/single/unprocessed/combined
+mkdir ./data/single/streamlined/combined
+mkdir ./data/single/gold/combined
 mkdir ./data/multi/gold/output/
 mkdir ./data/single/gold/combined/
 
 for i in {1..10}
 do
     mkdir ./data/single/gold/rater_$i/
+    rm -r ./data/single/gold/rater_$i/
+    rm -r ./data/single/streamlined/rater_$i/
 done
 
 rm -r ./data/full/streamlined/
