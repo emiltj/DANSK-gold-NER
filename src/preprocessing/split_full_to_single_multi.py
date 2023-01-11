@@ -75,19 +75,23 @@ for rater in raters:
         data[rater], unique_docs, docs_multiple_raters
     )
     # Saving single_docs_for_rater
+    outpath_single = f"./data/single/unprocessed/rater_{rater+1}/data.spacy"
     db_single = DocBin(store_user_data=True)
-    print(f"Saving docs that have been annotated by rater_{rater}, exclusively ...")
+    print(
+        f"Saving docs that have been annotated by rater_{rater}, exclusively to '{outpath_single}' ..."
+    )
     for doc in single_docs_for_rater:
         db_single.add(doc)
-    db_single.to_disk(f"./data/single/unprocessed/rater_{rater+1}/data.spacy")
+    db_single.to_disk(outpath_single)
 
     # Saving multiple_docs_for_rater
+    outpath_multi = f"./data/multi/unprocessed/rater_{rater+1}/data.spacy"
     db_multi = DocBin(store_user_data=True)
     print(
-        f"Saving docs that have been annotated by rater_{rater} and at least 1 other ... \n\n"
+        f"Saving docs that have been annotated by rater_{rater} and at least 1 other to '{outpath_multi}'... \n\n"
     )
     for doc in multiple_docs_for_rater:
         db_multi.add(doc)
-    db_multi.to_disk(f"./data/multi/unprocessed/rater_{rater+1}/data.spacy")
+    db_multi.to_disk(outpath_multi)
 
-print("\n\n Data has been split successfully")
+print("\n Data has been split successfully")
