@@ -3,9 +3,9 @@
 # The repository structure
 
 # Overarching idea for obtaining a gold-standard DANSK dataset
-- *Create folder structure for the data in the different stages*
-- *Import data*
-- *Assess data
+- **Create folder structure for the data in the different stages**
+- **Import data**
+- **Assess data**
     - Interrater reliability 
     - Annotations for the different raters
     - Number of raters for each unique doc
@@ -13,7 +13,7 @@
             - Poor annotations from rater 2
             - Poor annotations from rater 10
             - Rater 8 annotates "man", "sig selv" as PER ents
-- *Make appropriate changes in accordance with the the assesment of the raters*
+- **Make appropriate changes in accordance with the the assesment of the raters**
     - Cut away rater 2
     - Cut away rater 10
     - For rater 8:
@@ -21,14 +21,13 @@
         - Consider using:
             def is_stop_ent(span):
                 return all([t.is_stop for t in span])
-- *Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater*
-- *Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations*
-    ***** NOTE: ONLY RELEVANT IF - CHECK FIRST:
+- **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
+- **Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations**
+    ********** NOTE: ONLY RELEVANT IF - CHECK FIRST:
     - If many docs are rated by somewhere between 1 and 10, create rules for when to apply the streamlining (e.g. only in docs with > 3 raters)
     - If very few docs are rated by somewhere between 1 and 10, potentially delete these from the multiple streamlining
     - If all docs are rated by either 10 or 1, no problem - don't do anything
     - Reason: If there are e.g. 3 raters for a doc, then a 20% freq threshold for frequent ents is too low. But for 7 raters it is fine.
-
     - For each rater:
         - For each doc:
             - If the doc has been annotated by 3 raters:
@@ -47,23 +46,23 @@
                     - If there are no other frequent entities for the same span:
                         - Delete all annotations that overlap the span of the frequent entity
                         - Add annotation to all raters for the given doc
-- *Manually resolve the remaining conflicts in the streamlined data*
+- **Manually resolve the remaining conflicts in the streamlined data**
     - Save the gold-multi dataset
-- *Train a model on the gold-multi dataset*
+- **Train a model on the gold-multi dataset**
     - Use contextual embeddings from a transformer model (see DaCy and ask Kenneth at this point)
-- *Predict on the single data for each rater*
+- **Predict on the single data for each rater**
     - In a script
-- *Assess agreement between rater and model*
+- **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent.
-- *Potentially. Make appropriate changes on gold-standard-multi data on the basement of assessment between rater and model*
-- *Potentially. Re-train model on new gold-standard-multi data*
-- *Potentially. Re-predict on single data for each rater*
-- *Potentially. Re-assess agreement between rater and model*
-- *Potentially. Repeat above process*
-- *Manually resolve conflicts in single data (between model predictions and annotators)*
+- **Potentially. Make appropriate changes on gold-standard-multi data on the basement of assessment between rater and model**
+- **Potentially. Re-train model on new gold-standard-multi data**
+- **Potentially. Re-predict on single data for each rater**
+- **Potentially. Re-assess agreement between rater and model**
+- **Potentially. Repeat above process**
+- **Manually resolve conflicts in single data (between model predictions and annotators)**
     - Save the gold-single dataset
-- *Merge gold-single and gold-multi dataset into gold-dansk
-- *Save gold-dansk*
+- **Merge gold-single and gold-multi dataset into gold-dansk
+- **Save gold-dansk**
 
 
                 
