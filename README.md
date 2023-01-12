@@ -1,8 +1,6 @@
 # DANSK-gold-NER
 
-# The repository structure
-
-# Overarching idea for obtaining a gold-standard DANSK dataset
+## Overarching idea for obtaining a gold-standard DANSK dataset
 - **Create folder structure for the data in the different stages**
 - **Import data**
 - **Assess data**
@@ -61,16 +59,11 @@
 - **Potentially. Repeat above process**
 - **Manually resolve conflicts in single data (between model predictions and annotators)**
     - Save the gold-single dataset
-- **Merge gold-single and gold-multi dataset into gold-dansk
+- **Merge gold-single and gold-multi dataset into gold-dansk**
 - **Save gold-dansk**
 
 
-                
-            
-
-
-
-# Running this repo
+## Running this repo
 ```bash
 # Create folders for the data
 bash tools/create_data_folders.sh
