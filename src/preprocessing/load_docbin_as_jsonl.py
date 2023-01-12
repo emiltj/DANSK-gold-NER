@@ -34,7 +34,14 @@ def convert_examples(
 ) -> Iterator[Dict[str, Any]]:
     docs = doc_bin.get_docs(nlp.vocab)
     for doc in docs:
-        eg = {"text": doc.text, "tokens": [get_token(token, token.i) for token in doc]}
+        eg = {
+            "text": doc.text,
+            "tokens": [get_token(token, token.i) for token in doc],
+            "_is_binary": False,
+            "_view_id": "ner_manual",
+            "answer": "accept",
+            "_timestamp": 1635322276,
+        }
         if include_ner:
             spans = [
                 {"start": ent.start_char, "end": ent.end_char, "label": ent.label_}

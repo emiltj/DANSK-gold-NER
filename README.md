@@ -83,16 +83,16 @@ bash tools/rm_raters_from_db.sh
 python src/preprocessing/split_full_to_single_multi.py
 
 # Add unprocessed-single to the prodigy database
-bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
-bash tools/raters_to_db.sh -p single -d unprocessed -o 0
+# bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
+# bash tools/raters_to_db.sh -p single -d unprocessed -o 0
 
-# Merge the unprocessed-single data into a single "unprocessed-single-combined" .jsonl file
-prodigy db-merge rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 unprocessed-single-combined
-prodigy db-out unprocessed-single-combined data/single/unprocessed/combined
+# # Merge the unprocessed-single data into a single "unprocessed-single-combined" .jsonl file
+# prodigy db-merge rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 unprocessed-single-combined
+# prodigy db-out unprocessed-single-combined data/single/unprocessed/combined
 
 # Clear database again
-bash tools/rm_raters_from_db.sh
-prodigy drop unprocessed-single-combined
+# bash tools/rm_raters_from_db.sh
+# prodigy drop unprocessed-single-combined
 
 # Streamline the multi data by overwriting frequently tagged annotations to all raters data. Save as .spacy
 src/preprocessing/streamline/streamline_multi.ipynb
@@ -104,7 +104,7 @@ bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 
 # Manually resolve the remaining conflicts in the streamlined data
-prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A --view-id ner-manual
+prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A #--view-id ner-manual
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 prodigy db-out gold-multi data/multi/gold
@@ -127,3 +127,35 @@ prodigy db-merge gold-single,gold-multi gold-full
 prodigy db-out gold-full data/full/gold
 prodigy data-to-spacy data/full/gold data/full/gold --ner gold-full --lang "da" --eval-split 0
 ```
+
+
+
+prodigy drop 1
+prodigy drop 3
+prodigy drop ornew_gold
+prodigy db-in 1 test/1.jsonl
+prodigy db-in 3 test/3.jsonl
+prodigy review ornew_gold 1,3 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A
+
+Meta? 
+No
+
+Input hash and task hash? 
+No
+
+Tokens?
+Maybe -> Text appears twice, and annotations are not highlighting words
+
+Tokens with meta and task and input hash?
+No -> Same as Tokens
+
+Tokens with timestamp?
+No -> Same as Tokens
+
+Tokens with view_id, timestamp, answer, _is_binary
+No -> Same as Tokens
+
+Tokens with meta, hashes, and view_id, timestamp, answer, _is_binary
+No -> Same as Tokens
+
+

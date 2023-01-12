@@ -8,13 +8,16 @@ do
     esac
 done
 
+echo "$parent_dir"
+echo "$dir"
+
 for i in {1..10}
 do
     echo "Processing rater_$i ..."
-    FILE=./data/$parent_dir/$dir/rater_$i/data.spacy
+    FILE=./data/$parent_dir/$dir/rater_$i/train.spacy
     if test -f "$FILE"; then
-        python ./src/preprocessing/load_docbin_as_jsonl.py ./data/$parent_dir/$dir/rater_$i/data.spacy blank:da --ner > ./data/$parent_dir/$dir/rater_$i/data.jsonl
-        echo "/data/$parent_dir/$dir/rater_$i/data.spacy has been converted to /data/$parent_dir/$dir/rater_$i/data.jsonl
+        python ./src/preprocessing/load_docbin_as_jsonl.py $FILE blank:da --ner > ./data/$parent_dir/$dir/rater_$i/data.jsonl
+        echo "$FILE has been converted to ./data/$parent_dir/$dir/rater_$i/data.jsonl
         "
     else
         echo "No data for rater_$i, skipping
