@@ -1,0 +1,1 @@
+{"text": "Hvordan kan statsministeren kalde b\u00f8rn,der er f\u00f8dt p\u00e5 danske hospitaler for indvandrerdrenge!", "spans": [{"start": 12, "end": 27, "label": "PERSON"}, {"start": 54, "end": 60, "label": "NORP"}, {"start": 61, "end": 71, "label": "FACILITY"}, {"start": 76, "end": 92, "label": "NORP"}], "_view_id": "ner_manual"}
