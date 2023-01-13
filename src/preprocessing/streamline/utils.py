@@ -97,21 +97,56 @@ def doc_ents_count(exploded_doc, n_raters, match_label_and_text=True):
 
 
 # Define a function for finding frequent annotations (above certain threshold)
-def retrieve_freq_ents(unique_ents, unique_ents_ratio, threshold):
-    return [
-        unique_ent
-        for unique_ent, unique_ent_ratio in zip(unique_ents, unique_ents_ratio)
-        if unique_ent_ratio >= threshold
-    ]
+def retrieve_freq_ents(
+    unique_ents, unique_ents_count, unique_ents_ratio, threshold, n_raters
+):
+    if n_raters <= 2:
+        freq_ents = []
+
+    if n_raters in [3, 4, 5, 6]:
+        freq_ents = [
+            unique_ent
+            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
+            if unique_ent_count >= 2
+        ]
+
+    if n_raters in [7, 8, 9, 10]:
+        freq_ents = [
+            unique_ent
+            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
+            if unique_ent_count >= 3
+        ]
+    return freq_ents
+
+    # return [
+    #     unique_ent
+    #     for unique_ent, unique_ent_ratio in zip(unique_ents, unique_ents_ratio)
+    #     if unique_ent_ratio >= threshold
+    # ]
 
 
 # Define a function for finding infrequent annotations (below certain threshold)
-def retrieve_infreq_ents(unique_ents, unique_ents_ratio, threshold):
-    return [
-        unique_ent
-        for unique_ent, unique_ent_ratio in zip(unique_ents, unique_ents_ratio)
-        if unique_ent_ratio <= threshold
-    ]
+def retrieve_infreq_ents(
+    unique_ents, unique_ents_count, unique_ents_ratio, threshold, n_raters
+):
+    if n_raters <= 5:
+        infreq_ents = []
+
+    if n_raters in [6, 7, 8]:
+        infreq_ents = [
+            unique_ent
+            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
+            if unique_ent_count <= 1
+        ]
+
+    if n_raters > 8:
+        infreq_ents = [
+            unique_ent
+            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
+            if unique_ent_count <= 2
+        ]
+
+    return infreq_ents
 
 
 # Function for determining whether two tokens occupy parts of the same span
@@ -205,8 +240,6 @@ def rm_exact_span_ents_in_doc(doc, frequent_ents_for_doc):
 # Define a function for adding a frequent entity to a doc
 def _add_freq_ent_to_doc(doc, frequent_ent_for_a_doc):
     new_doc_ents = doc.ents + (frequent_ent_for_a_doc,)
-    print(f"doc.ents: {doc.ents}")
-    print(f"new_doc_ents: {new_doc_ents}")
     doc.ents = new_doc_ents
     return doc
 
@@ -252,7 +285,11 @@ def retrieve_freq_and_infreq_ents_from_doc(
 
     # Retrieve a list of ents that have a ratio under a certain threshold
     infreq_unique_ents_partial_match = retrieve_infreq_ents(
-        unique_ents_partial_match, unique_ents_partial_match_ratio, threshold_infreq
+        unique_ents_partial_match,
+        unique_ents_partial_match_count,
+        unique_ents_partial_match_ratio,
+        threshold_infreq,
+        n_raters,
     )
 
     # If infrequent entities take up the same span, delete them from the infrequent entities list
@@ -275,7 +312,11 @@ def retrieve_freq_and_infreq_ents_from_doc(
 
     # Retrieve a list of ents that have a ratio over a certain threshold
     freq_unique_ents_full_match = retrieve_freq_ents(
-        unique_ents_full_match, unique_ents_full_match_ratio, threshold_freq
+        unique_ents_full_match,
+        unique_ents_full_match_count,
+        unique_ents_full_match_ratio,
+        threshold_freq,
+        n_raters,
     )
 
     # Retrieve a list of ents that occupy the span of other ents
