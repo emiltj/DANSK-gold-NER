@@ -155,6 +155,10 @@ def _rm_same_span_ent_in_doc(doc, frequent_ent_for_doc):
             or item.end_char
             == frequent_ent_for_doc.end_char  # OR instead of AND is the difference
         )
+        or (
+            item.start_char <= frequent_ent_for_doc.start_char
+            and item.end_char >= frequent_ent_for_doc.end_char
+        )
     ]
     # Remove doc.ents with those indices
     doc_ents = list(doc.ents)
@@ -201,6 +205,8 @@ def rm_exact_span_ents_in_doc(doc, frequent_ents_for_doc):
 # Define a function for adding a frequent entity to a doc
 def _add_freq_ent_to_doc(doc, frequent_ent_for_a_doc):
     new_doc_ents = doc.ents + (frequent_ent_for_a_doc,)
+    print(f"doc.ents: {doc.ents}")
+    print(f"new_doc_ents: {new_doc_ents}")
     doc.ents = new_doc_ents
     return doc
 

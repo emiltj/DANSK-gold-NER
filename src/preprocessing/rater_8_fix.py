@@ -1,6 +1,6 @@
 from spacy.tokens import DocBin
 import os
-import dacy
+import spacy
 import copy
 
 # Change cwd

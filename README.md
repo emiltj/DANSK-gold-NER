@@ -17,11 +17,11 @@
     - For rater 8:
         - Exclude all PER annotations if the individual tokens.is_stop = True
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
+- **Investigate the distribution of the number of raters for the multi data**
+    - Roughly 25% of multi docs have been rated by 2 raters
+    - Roughly 25% of multi docs have been rated by 10 raters
+    - Roughly 50% of multi docs have been rated by >2 and <10
 - **Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations**
-    ********** NOTE: ONLY RELEVANT IF - CHECK FIRST:
-    - If many docs are rated by somewhere between 1 and 10, create rules for when to apply the streamlining (e.g. only in docs with > 3 raters)
-    - If very few docs are rated by somewhere between 1 and 10, potentially delete these from the multiple streamlining
-    - If all docs are rated by either 10 or 1, no problem - don't do anything
     - Reason: If there are e.g. 3 raters for a doc, then a 20% freq threshold for frequent ents is too low. But for 7 raters it is fine.
     - For each rater:
         - For each doc:
@@ -75,6 +75,12 @@ bash tools/raters_to_db.sh -o 1
 # As DANSK is only available in .jsonl format, convert it to DocBins /.spacy files, using prodigy's database (and remove them from db again)
 bash tools/raters_from_db_to_spacy.sh
 bash tools/rm_raters_from_db.sh
+
+# Assess data
+#src/data_assessment/
+
+# Fix rater 8 data
+python src/preprocessing/rater_8_fix.py
 
 # Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
 python src/preprocessing/split_full_to_single_multi.py
