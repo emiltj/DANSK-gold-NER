@@ -1,6 +1,6 @@
 # DANSK-gold-NER
 
-## Overarching idea for obtaining a gold-standard DANSK dataset
+## Steps for obtaining a gold-standard DANSK dataset
 - **Create folder structure for the data in the different stages**
 - **Import data**
 - **Assess data**
@@ -16,9 +16,6 @@
     - Cut away rater 10
     - For rater 8:
         - Exclude all PER annotations if the individual tokens.is_stop = True
-        - Consider using:
-            def is_stop_ent(span):
-                return all([t.is_stop for t in span])
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
 - **Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations**
     ********** NOTE: ONLY RELEVANT IF - CHECK FIRST:
@@ -104,7 +101,7 @@ bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 
 # Manually resolve the remaining conflicts in the streamlined data
-prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A #--view-id ner-manual
+prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 prodigy db-out gold-multi data/multi/gold

@@ -15,7 +15,7 @@ os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 
 # Load language object
-nlp = dacy.load("medium")
+nlp = spacy.blank("da")
 
 
 # List relevant data and sort by rater number

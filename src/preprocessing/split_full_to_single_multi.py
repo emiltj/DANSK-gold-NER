@@ -4,12 +4,14 @@ import re
 import glob
 from spacy.tokens import DocBin
 
+subset = True
 
 # Change cwd
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 # Load language object
-nlp = dacy.load("medium")
+nlp = spacy.blank("da")
+# nlp = dacy.load("medium")
 
 # List relevant data and sort by rater number
 data_paths = glob.glob("./data/full/unprocessed/rater*/train.spacy")
@@ -28,7 +30,12 @@ for path in data_paths:
 
     # Load data
     doc_bin = DocBin().from_disk(path)
-    docs = list(doc_bin.get_docs(nlp.vocab))[:200]  ## THIS IS FOR DOING ONLY PART OF IT
+    if subset == True:
+        docs = list(doc_bin.get_docs(nlp.vocab))[
+            :100
+        ]  ## THIS IS FOR DOING ONLY PART OF IT, SUBSET
+    else:
+        docs = list(doc_bin.get_docs(nlp.vocab))
     data.append(docs)
 
 print("Retrieving list of unique docs ...\n")
@@ -47,10 +54,12 @@ for i in range(len(unique_docs)):
     print(
         f"Checking whether unique doc number {i} out of a total of {len(unique_docs)} unique docs has been rated by multiple .."
     )
-    doc = unique_docs[i]
+    unique_doc = unique_docs[i]
     all_doc_texts = [doc.text for doc in flat_list]
-    if all_doc_texts.count(doc.text) > 1:
+    if all_doc_texts.count(unique_doc.text) > 1:
         docs_multiple_raters[i] = True
+
+docs_multiple_raters
 
 # Function for splitting rater_data into rater_data_single and rater_data_multiple
 def split_by_n_raters(rater_data, unique_docs, docs_multiple_raters):
@@ -66,11 +75,11 @@ def split_by_n_raters(rater_data, unique_docs, docs_multiple_raters):
     return single_docs_for_rater, multiple_docs_for_rater
 
 
-print("\n\n Commencing splitting of docs for raters ...")
+print("\n\nCommencing splitting of docs for raters ...")
 # Split data for each rater into docs with single raters, and docs with multiple raters.
 # Also save as DocBin
 for rater in raters:
-    print(f"Splitting and saving data from rater_{rater} ...")
+    print(f"Splitting and saving data from rater_{rater+1}")
     single_docs_for_rater, multiple_docs_for_rater = split_by_n_raters(
         data[rater], unique_docs, docs_multiple_raters
     )
@@ -78,7 +87,7 @@ for rater in raters:
     outpath_single = f"./data/single/unprocessed/rater_{rater+1}/data.spacy"
     db_single = DocBin(store_user_data=True)
     print(
-        f"Saving docs that have been annotated by rater_{rater}, exclusively to '{outpath_single}' ..."
+        f"Saving docs that have been annotated by not other raters (single) to '{outpath_single}' ..."
     )
     for doc in single_docs_for_rater:
         db_single.add(doc)
@@ -88,10 +97,10 @@ for rater in raters:
     outpath_multi = f"./data/multi/unprocessed/rater_{rater+1}/data.spacy"
     db_multi = DocBin(store_user_data=True)
     print(
-        f"Saving docs that have been annotated by rater_{rater} and at least 1 other to '{outpath_multi}'... \n\n"
+        f"Saving docs that have been annotated by other raters as well (multi) to '{outpath_multi}'... \n\n"
     )
     for doc in multiple_docs_for_rater:
         db_multi.add(doc)
     db_multi.to_disk(outpath_multi)
 
-print("\n Data has been split successfully")
+print("Data has been split successfully")
