@@ -181,17 +181,25 @@ def get_same_doc_index(doc, list_of_docs):
 
 # Define a function for deleting any ents in a doc that exist in the same span as a frequent ent
 def _rm_same_span_ent_in_doc(doc, frequent_ent_for_doc):
-    # Find indexes of doc.ents where either the start- or end character is the same as for the frequent entity
+    # Find indexes of doc.ents where either ...
     idxs_of_removable_ents = [
         idx
         for idx, item in enumerate(list(doc.ents))
-        if (
+        if (  # ... the start- or end character is the same as for the frequent entity
             item.start_char == frequent_ent_for_doc.start_char
             or item.end_char
             == frequent_ent_for_doc.end_char  # OR instead of AND is the difference
         )
-        or (
+        or (  # ... the start character is smaller than for the freq entity and where the end-character is larger than the freq entity
             item.start_char <= frequent_ent_for_doc.start_char
+            and item.end_char >= frequent_ent_for_doc.end_char
+        )
+        or (  # ... the start character is smaller than for the freq entity and where the end-character is smaller than the freq entity
+            item.start_char <= frequent_ent_for_doc.start_char
+            and item.end_char <= frequent_ent_for_doc.end_char
+        )
+        or (  # ... the start character is larger than for the freq entity and where the end-character is larger than the freq entity
+            item.start_char >= frequent_ent_for_doc.start_char
             and item.end_char >= frequent_ent_for_doc.end_char
         )
     ]
@@ -327,10 +335,36 @@ def retrieve_freq_and_infreq_ents_from_doc(
 
     # Retrieve a list of indexes of same span ents
     unique_ents_full_match_same_span_indexes = [
-        unique_ents_full_match.index(ent) for ent in unique_ents_full_match_same_span
+        freq_unique_ents_full_match.index(ent)
+        for ent in unique_ents_full_match_same_span
+        # unique_ents_full_match.index(ent) for ent in unique_ents_full_match_same_span
     ]
+    # print(freq_unique_ents_full_match)
+    # print(unique_ents_full_match)
+    # print(unique_ents_full_match_same_span)
+    # print(unique_ents_full_match_same_span_indexes)
 
     # print(f"indexes of same span ents: {unique_ents_full_match_same_span_indexes}")
+
+    # print("\nunique_ents_full_match_same_span_indexes:")
+    # print(unique_ents_full_match_same_span_indexes)
+
+    # print("\nunique_ents_full_match_same_span_indexes[0]:")
+    # print(unique_ents_full_match_same_span_indexes[0])
+
+    # print("\nunique_ents_full_match_same_span_indexes[1]:")
+    # print(unique_ents_full_match_same_span_indexes[1])
+
+    # print("\nfreq_unique_ents_full_match:")
+    # print(freq_unique_ents_full_match)
+
+    # print("\nfreq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[0]]:")
+    # print(freq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[0]])
+
+    # print("\nfreq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[1]]:")
+    # print(freq_unique_ents_full_match[unique_ents_full_match_same_span_indexes[1]])
+
+    # print("\n")
 
     # If there are exactly 2 frequent entities that overlap in span, only keep the most frequent. If both equally, delete both
     if len(unique_ents_full_match_same_span_indexes) == 2:
@@ -362,13 +396,16 @@ def retrieve_freq_and_infreq_ents_from_doc(
         for idx in sorted(unique_ents_full_match_same_span_indexes, reverse=True):
             del freq_unique_ents_full_match[idx]
 
+    # print(freq_unique_ents_full_match)
+
     return (
         unique_ents_full_match,
         unique_ents_partial_match,
         freq_unique_ents_full_match,
         infreq_unique_ents_partial_match,
-        unique_ents_full_match_ratio,
-        unique_ents_partial_match_ratio,
+        unique_ents_full_match_count,
+        unique_ents_partial_match_count,
+        n_raters,
     )
 
 

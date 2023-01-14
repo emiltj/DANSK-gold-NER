@@ -22,6 +22,7 @@
     - Roughly 25% of multi docs have been rated by 10 raters
     - Roughly 50% of multi docs have been rated by >2 and <10
 - **Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations**
+    - Reason: If there are e.g. 3 raters for a doc, then a 20% freq threshold for frequent ents is too low. But for 7 raters it is fine.
     - For each rater:
         - For each doc:
             - If the doc has been annotated by 3 raters:
@@ -84,6 +85,18 @@ python src/preprocessing/rater_8_fix.py
 # Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
 python src/preprocessing/split_full_to_single_multi.py
 
+# Add unprocessed-single to the prodigy database
+# bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
+# bash tools/raters_to_db.sh -p single -d unprocessed -o 0
+
+# # Merge the unprocessed-single data into a single "unprocessed-single-combined" .jsonl file
+# prodigy db-merge rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 unprocessed-single-combined
+# prodigy db-out unprocessed-single-combined data/single/unprocessed/combined
+
+# Clear database again
+# bash tools/rm_raters_from_db.sh
+# prodigy drop unprocessed-single-combined
+
 # Streamline the multi data by overwriting frequently tagged annotations to all raters data. Save as .spacy
 src/preprocessing/streamline/streamline_multi.ipynb
 
@@ -102,19 +115,6 @@ prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split
 
 # Train a NER-model on the gold-multi
 python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
-
-# Add unprocessed-single to the prodigy database
-# bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
-# bash tools/raters_to_db.sh -p single -d unprocessed -o 0
-
-# # Merge the unprocessed-single data into a single "unprocessed-single-combined" .jsonl file
-# prodigy db-merge rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_9 unprocessed-single-combined
-# prodigy db-out unprocessed-single-combined data/single/unprocessed/combined
-
-# Clear database again
-# bash tools/rm_raters_from_db.sh
-# prodigy drop unprocessed-single-combined
-
 
 # Predict on the unprocessed-single-combined using the gold-multi-NER model
 # ??
