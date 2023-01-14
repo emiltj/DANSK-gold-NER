@@ -130,35 +130,3 @@ prodigy db-merge gold-single,gold-multi gold-full
 prodigy db-out gold-full data/full/gold
 prodigy data-to-spacy data/full/gold data/full/gold --ner gold-full --lang "da" --eval-split 0
 ```
-
-
-
-prodigy drop 1
-prodigy drop 3
-prodigy drop ornew_gold
-prodigy db-in 1 test/1.jsonl
-prodigy db-in 3 test/3.jsonl
-prodigy review ornew_gold 1,3 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A
-
-Meta? 
-No
-
-Input hash and task hash? 
-No
-
-Tokens?
-Maybe -> Text appears twice, and annotations are not highlighting words
-
-Tokens with meta and task and input hash?
-No -> Same as Tokens
-
-Tokens with timestamp?
-No -> Same as Tokens
-
-Tokens with view_id, timestamp, answer, _is_binary
-No -> Same as Tokens
-
-Tokens with meta, hashes, and view_id, timestamp, answer, _is_binary
-No -> Same as Tokens
-
-
