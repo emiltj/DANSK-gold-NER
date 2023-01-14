@@ -265,7 +265,7 @@ def retrieve_freq_and_infreq_ents_from_doc(
 ):
     # Get number of raters that have annotated the doc
     n_raters = count_raters_for_doc(doc, all_docs)
-
+    print(n_raters)
     # Retrieve a list of annotated entities for a given doc, across all raters
     ents = retrieve_all_ents(doc, all_docs)
 
@@ -367,8 +367,9 @@ def retrieve_freq_and_infreq_ents_from_doc(
         unique_ents_partial_match,
         freq_unique_ents_full_match,
         infreq_unique_ents_partial_match,
-        unique_ents_full_match_ratio,
-        unique_ents_partial_match_ratio,
+        unique_ents_full_match_count,
+        unique_ents_partial_match_count,
+        n_raters,
     )
 
 
