@@ -8,9 +8,6 @@ do
     esac
 done
 
-echo "$parent_dir"
-echo "$dir"
-
 for i in {1..10}
 do
     echo "Processing rater_$i ..."
