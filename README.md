@@ -25,22 +25,36 @@
     - Reason: If there are e.g. 3 raters for a doc, then a 20% freq threshold for frequent ents is too low. But for 7 raters it is fine.
     - For each rater:
         - For each doc:
-            - If the doc has been annotated by 3 raters:
-                - If an entity has been annotated by 2/3 of raters (Strict match as defined by https://pypi.org/project/nervaluate/) then:
-                    - Delete all annotations that overlap the span of the frequent entity
-                    - Add annotation to all raters for the given doc
-            - If the doc has been annotated by 4 raters:
-                - If an entity has been annotated by +2 raters (Strict match as defined by https://pypi.org/project/nervaluate/) then:
-                    - If there are no other frequent entities for the same span:
-                        - Delete all annotations that overlap the span of the frequent entity
-                        - Add annotation to all raters for the given doc
-            - If the doc has been annotated by > 4 raters:
-                - If an entity has been annotated by 1 or fewer raters:
-                    - Delete this annotation in the doc for all rater
-                - If an entity has been annotated by +2 raters (Strict match as defined by https://pypi.org/project/nervaluate/) then:
-                    - If there are no other frequent entities for the same span:
-                        - Delete all annotations that overlap the span of the frequent entity
-                        - Add annotation to all raters for the given doc
+            - Adding frequent ents:
+                - If the doc has been annotated by fewer than 3 raters:
+                    - Do nothing
+                - If the doc has been annotated by 3-6 raters:
+                    - If an entity has been annotated by 2 or more raters (Strict match as defined by https://pypi.org/project/nervaluate/ meaning that the span AND tag is the exact same) then:
+                        - Add it to list of frequent entities
+                    - If a span appears twice (full or partial overlap) in the list of frequent entities, delete the least frequent of the two from the list
+                    - If a span appears 3 times or more (full or partial overlap) in the list of frequent entities, delete all frequent ents with this overlap from the list
+                    - For each frequent entity in the list:
+                        - Delete any annotations from any raters that overlap (even partially) the span of the frequent entity
+                        - Add the frequent annotation for all raters for the given doc
+                - If the doc has been annotated by 7-10 raters:
+                    - If an entity has been annotated by 3 or more raters (Strict match as defined by https://pypi.org/project/nervaluate/ meaning that the span AND tag is the exact same) then:
+                        - Add it to list of frequent entities
+                    - If a span appears twice (full or partial overlap) in the list of frequent entities, delete the least frequent of the two from the list
+                    - If a span appears 3 times or more (full or partial overlap) in the list of frequent entities, delete all frequent ents with this overlap from the list
+                    - For each frequent entity in the list:
+                        - Delete any annotations from any raters that overlap (even partially) the span of the frequent entity
+                        - Add the frequent annotation for all raters for the given doc
+            - Deleting infrequent ents:
+                - If the doc has been annotated by 2-5 raters:
+                    - Do nothing 
+                - If the doc has been annotated by 6-8 raters:
+                    - If a ent/span has been annotated by 1 rater (Exact match as defined by https://pypi.org/project/nervaluate/ meaning that the span is the same, but tag can differ) and no other annotations overlap then:
+                        - If no other ents exists in the same span for any rater (even partially)
+                            - Delete ent (strict match) in all raters
+                - If the doc has been annotated by >8 raters:
+                    - If a ent/span has been annotated by 2 raters (Exact match as defined by https://pypi.org/project/nervaluate/ meaning that the span is the same, but tag can differ) and no other annotations overlap then:
+                        - If no other ents exists in the same span for any rater (even partially)
+                            - Delete ent (strict match) in all raters
 - **Manually resolve the remaining conflicts in the streamlined data**
     - Save the gold-multi dataset
 - **Train a model on the gold-multi dataset**
