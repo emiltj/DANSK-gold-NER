@@ -20,6 +20,8 @@ data_paths.sort()
 data_paths.sort(key="./data/full/unprocessed/rater_10/train.spacy".__eq__)
 print("\n\nReading in data")
 
+data_paths
+
 # Load in data and get rater indices (if not already loaded)
 data = []
 raters = []
@@ -27,7 +29,7 @@ for path in data_paths:
     print(f"Reading in data from {path} as DocBin ...")
     # Get rater indices
     rater = re.search(r"\d+", path).group()
-    raters.append(int(rater) - 1)
+    raters.append(int(rater))
 
     # Load data
     doc_bin = DocBin().from_disk(path)
@@ -36,6 +38,12 @@ for path in data_paths:
     else:
         docs = list(doc_bin.get_docs(nlp.vocab))
     data.append(docs)
+
+
+raters_idx = list(range(len(raters)))
+raters_idx_lookup = {0: 1, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9}
+# Keys = Index
+# Value = Rater number
 
 print("Retrieving list of unique docs ...\n")
 
@@ -91,17 +99,20 @@ def split_by_n_raters(rater_data, unique_docs, docs_multiple_raters):
     return single_docs_for_rater, multiple_docs_for_rater
 
 
+# for rater_idx, rater in enumerate(raters):
+#     print(f"rater_idx: {rater_idx} \n rater: {rater}")
+
 print("\n\nCommencing splitting of docs for raters ...")
 # Split data for each rater into docs with single raters, and docs with multiple raters.
 # Also save as DocBin
-for rater in raters:
-    print(f"Splitting and saving data from rater_{rater+1}")
+for rater_idx, rater in enumerate(raters):
+    print(f"Splitting and saving data from rater_{rater}")
     single_docs_for_rater, multiple_docs_for_rater = split_by_n_raters(
-        data[rater], unique_docs, docs_multiple_raters
+        data[rater_idx], unique_docs, docs_multiple_raters
     )
 
     # Saving single_docs_for_rater
-    outpath_single = f"./data/single/unprocessed/rater_{rater+1}/data.spacy"
+    outpath_single = f"./data/single/unprocessed/rater_{rater}/data.spacy"
     db_single = DocBin(store_user_data=True)
     print(
         f"Saving docs that have been annotated by not other raters (single) to '{outpath_single}' ..."
@@ -111,7 +122,7 @@ for rater in raters:
     db_single.to_disk(outpath_single)
 
     # Saving multiple_docs_for_rater
-    outpath_multi = f"./data/multi/unprocessed/rater_{rater+1}/data.spacy"
+    outpath_multi = f"./data/multi/unprocessed/rater_{rater}/data.spacy"
     db_multi = DocBin(store_user_data=True)
     print(
         f"Saving docs that have been annotated by other raters as well (multi) to '{outpath_multi}'... \n\n"

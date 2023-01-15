@@ -79,6 +79,10 @@ bash tools/rm_raters_from_db.sh
 # Assess data
 #src/data_assessment/
 
+# Remove rater 2 and 10
+rm -r -f data/full/unprocessed/rater_2/*
+rm -r -f data/full/unprocessed/rater_10/*
+
 # Fix rater 8 data
 python src/preprocessing/rater_8_fix.py
 

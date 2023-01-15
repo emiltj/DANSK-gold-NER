@@ -18,6 +18,8 @@ then
     done
 #rm -r data/prodigy_exports
 rm data/prodigy_exports.zip
+rm data/full/unprocessed/rater_02
+rm data/full/unprocessed/rater_10
 fi
 
 if [[ $original = 0 ]];
@@ -28,3 +30,4 @@ then
         prodigy db-in rater_"$i" ./data/$parent_dir/$dir/rater_$i/data.jsonl
     done
 fi
+
