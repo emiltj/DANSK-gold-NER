@@ -1,6 +1,6 @@
 # DANSK-gold-NER
 
-## Steps for obtaining a gold-standard DANSK dataset
+## Repository pipeline
 - **Create folder structure for the data in the different stages**
 - **Import data**
 - **Assess data**
@@ -11,11 +11,13 @@
             - Poor annotations from rater 2
             - Poor annotations from rater 10
             - Rater 8 annotates "man", "sig selv" as PER ents
+            - No tags for LANGUAGE, and very poor tagging for PRODUCT
 - **Make appropriate changes in accordance with the the assesment of the raters**
     - Cut away rater 2
     - Cut away rater 10
     - For rater 8:
         - Exclude all PER annotations if the individual tokens.is_stop = True
+    - Remove all ents with LANGUAGE and PRODUCT
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
 - **Investigate the distribution of the number of raters for the multi data**
     - Roughly 25% of multi docs have been rated by 2 raters
@@ -26,17 +28,9 @@
     - For each rater:
         - For each doc:
             - Adding frequent ents:
-                - If the doc has been annotated by fewer than 3 raters:
+                - If the doc has been annotated by fewer than 4 raters:
                     - Do nothing
-                - If the doc has been annotated by 3-6 raters:
-                    - If an entity has been annotated by 2 or more raters (Strict match as defined by https://pypi.org/project/nervaluate/ meaning that the span AND tag is the exact same) then:
-                        - Add it to list of frequent entities
-                    - If a span appears twice (full or partial overlap) in the list of frequent entities, delete the least frequent of the two from the list
-                    - If a span appears 3 times or more (full or partial overlap) in the list of frequent entities, delete all frequent ents with this overlap from the list
-                    - For each frequent entity in the list:
-                        - Delete any annotations from any raters that overlap (even partially) the span of the frequent entity
-                        - Add the frequent annotation for all raters for the given doc
-                - If the doc has been annotated by 7-10 raters:
+                - If the doc has been annotated by 4-8 raters:
                     - If an entity has been annotated by 3 or more raters (Strict match as defined by https://pypi.org/project/nervaluate/ meaning that the span AND tag is the exact same) then:
                         - Add it to list of frequent entities
                     - If a span appears twice (full or partial overlap) in the list of frequent entities, delete the least frequent of the two from the list
@@ -49,10 +43,6 @@
                     - Do nothing 
                 - If the doc has been annotated by 6-8 raters:
                     - If a ent/span has been annotated by 1 rater (Exact match as defined by https://pypi.org/project/nervaluate/ meaning that the span is the same, but tag can differ) and no other annotations overlap then:
-                        - If no other ents exists in the same span for any rater (even partially)
-                            - Delete ent (strict match) in all raters
-                - If the doc has been annotated by >8 raters:
-                    - If a ent/span has been annotated by 2 raters (Exact match as defined by https://pypi.org/project/nervaluate/ meaning that the span is the same, but tag can differ) and no other annotations overlap then:
                         - If no other ents exists in the same span for any rater (even partially)
                             - Delete ent (strict match) in all raters
 - **Manually resolve the remaining conflicts in the streamlined data**
@@ -73,8 +63,8 @@
 - **Merge gold-single and gold-multi dataset into gold-dansk**
 - **Save gold-dansk**
 
-
-## Running this repo
+## Repository pipeline implemented
+### Creating gold-multi
 ```bash
 # Create folders for the data
 bash tools/create_data_folders.sh
@@ -113,14 +103,19 @@ bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 
 # Manually resolve the remaining conflicts in the streamlined data
-prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A
+prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
+```
+### Creating gold-single
+```bash
+# Define a better config with fine-tuning from transformer model (ask Kenneth)
+##
 
 # Train a NER-model on the gold-multi
-python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
+# python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
 
 # Add unprocessed-single to the prodigy database
 # bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
@@ -139,8 +134,11 @@ python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/t
 
 # Resolve conflicts between model and single raters
 # ??
-# Maybe something like: prodigy review gold-single <name_of_original_raters>,<name_of_predictions> --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL -S -A
+# Maybe something like: prodigy review gold-single <name_of_original_raters>,<name_of_predictions> --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+```
 
+### Creating gold-full
+```bash
 # Merge the combined gold-dansk-single with gold-dansk-multi
 prodigy db-merge gold-single,gold-multi gold-full
 
@@ -148,3 +146,38 @@ prodigy db-merge gold-single,gold-multi gold-full
 prodigy db-out gold-full data/full/gold
 prodigy data-to-spacy data/full/gold data/full/gold --ner gold-full --lang "da" --eval-split 0
 ```
+
+## Named Entity Recognition (NER) tagging guidelines
+
+This type of tagging is to determine what entities are present in a given text. There are 18 possible tags that can be used and the visual below describes them all. 
+
+### Named Entity types
+Names (often referred to as *"Named entities"*) are annotated to the following set of types:
+|              |                                                      |
+| ------------ | ---------------------------------------------------- |
+| PERSON       | People, including fictional                          |
+| NORP         | Nationalities or religious or political groups       |
+| FACILITY     | Building, airports, highways, bridges, etc.          |
+| ORGANIZATION | Companies, agencies, institutions, etc.              |
+| LOCATION     | Non-GPE locations, mountain ranges, bodies of water  |
+| PRODUCT      | Vehicles, weapons, foods, etc. (not services)        |
+| EVENT        | Named hurricanes, battles, wars, sports events, etc. |
+| WORK OF ART  | Titles of books, songs, etc.                         |
+| LAW          | Named documents made into laws                       |
+| LANGUAGE     | Any named language                                   |
+| GPE          | Countries, cities, states.
+
+
+The following values are also annotated in style similar to names:
+
+|          |                                             |
+| -------- | ------------------------------------------- |
+| DATE     | Absolute or relative dates or periods       |
+| TIME     | Times smaller than a day                    |
+| PERCENT  | Percentage (including *"%"*)                |
+| MONEY    | Monetary values, including unit             |
+| QUANTITY | Measurements, as of weight or distance      |
+| ORDINAL  | "first", "second"                           |
+| CARDINAL | Numerals that do no fall under another type |
+
+### Named Entity inconsistencies and the chosen way of resolvement
