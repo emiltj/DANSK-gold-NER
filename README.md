@@ -3,15 +3,18 @@
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
 - **Import data**
+    - Also merge the two sets for each rater (while in the db)
 - **Assess data**
-    - Interrater reliability 
-    - Annotations for the different raters
-    - Number of raters for each unique doc
-        - Current findings: 
-            - Poor annotations from rater 2
-            - Poor annotations from rater 10
-            - Rater 8 annotates "man", "sig selv" as PER ents
-            - No tags for LANGUAGE, and very poor tagging for PRODUCT
+    - Assessment of:
+        - Interrater reliability 
+        - Annotations for the different raters
+        - Number of raters for each unique doc
+        - Duplicates
+    - Current findings: 
+        - Poor annotations from rater 2
+        - Poor annotations from rater 10
+        - Rater 8 annotates "man", "sig selv" as PER ents
+        - No tags for LANGUAGE, and very poor tagging for PRODUCT
 - **Make appropriate changes in accordance with the the assesment of the raters**
     - Cut away rater 2
     - Cut away rater 10
@@ -73,6 +76,7 @@ bash tools/create_data_folders.sh
 Download DANSK, unzip and place unzipped folder in data/
 
 ```bash
+
 # Add DANSK to database
 bash tools/raters_to_db.sh -o 1
 
@@ -81,7 +85,9 @@ bash tools/raters_from_db_to_spacy.sh
 bash tools/rm_raters_from_db.sh
 
 # Assess data
-#src/data_assessment/
+# src/data_assessment/n_duplicates_for_files.ipynb
+# src/data_assessment/n_raters_for_each_doc.ipynb
+# src/data_assessment/interrater_reliability/interrater_reliability.ipynb
 
 # Remove rater 2 and 10
 rm -r -f data/full/unprocessed/rater_2/*
@@ -89,6 +95,9 @@ rm -r -f data/full/unprocessed/rater_10/*
 
 # Fix rater 8 data
 python src/preprocessing/rater_8_fix.py
+
+# Remove PRODUCT and LANGUAGE tags
+python src/preprocessing/rm_product_and_language.py
 
 # Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
 python src/preprocessing/split_full_to_single_multi.py
@@ -181,3 +190,18 @@ The following values are also annotated in style similar to names:
 | CARDINAL | Numerals that do no fall under another type |
 
 ### Named Entity inconsistencies and the chosen way of resolvement
+#### Pipeline for resolving inconsistencies in which there is doubt, during the manual Prodigy review
+1. Internal dialogue with colleagues on the basis of predictions by https://huggingface.co/tner/roberta-large-ontonotes5 on a similar sentence in English
+2. Example is written down under "Examples", here below 
+
+#### Specific rules
+- In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
+- In cases where a doc with minimal context is provided and multiple tags may be appropriate, disregard the doc (no parking sign in Prodigy). E.g. 'Pande' might be tagged as verb or noun.
+
+#### Examples
+**Doc:**
+- 
+**Conflicting ents:**
+- 
+**Ents:**
+- 
