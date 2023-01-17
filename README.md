@@ -76,6 +76,8 @@ bash tools/create_data_folders.sh
 Download DANSK, unzip and place unzipped folder in data/
 
 ```bash
+# Merge original data sources from each rater, and remove duplicates (matching on meta and on text) - only keep the last rated (from timestamp)
+python src/preprocessing/merge_and_rm_dupli.py
 
 # Add DANSK to database
 bash tools/raters_to_db.sh -o 1

@@ -202,6 +202,10 @@ def _rm_same_span_ent_in_doc(doc, frequent_ent_for_doc):
             item.start_char >= frequent_ent_for_doc.start_char
             and item.end_char >= frequent_ent_for_doc.end_char
         )
+        or (  # ... the start character is larger than for the freq entity and where the end-character is smaller than the freq entity
+            item.start_char >= frequent_ent_for_doc.start_char
+            and item.end_char <= frequent_ent_for_doc.end_char
+        )
     ]
     # Remove doc.ents with those indices
     doc_ents = list(doc.ents)
