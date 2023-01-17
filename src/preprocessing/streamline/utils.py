@@ -100,53 +100,30 @@ def doc_ents_count(exploded_doc, n_raters, match_label_and_text=True):
 def retrieve_freq_ents(
     unique_ents, unique_ents_count, unique_ents_ratio, threshold, n_raters
 ):
-    if n_raters <= 2:
-        freq_ents = []
-
-    if n_raters in [3, 4, 5, 6]:
-        freq_ents = [
+    return (
+        [
             unique_ent
-            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
-            if unique_ent_count >= 2
+            for unique_ent, unique_ent_ratio in zip(unique_ents, unique_ents_ratio)
+            if unique_ent_ratio >= 0.5
         ]
-
-    if n_raters in [7, 8, 9, 10]:
-        freq_ents = [
-            unique_ent
-            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
-            if unique_ent_count >= 3
-        ]
-    return freq_ents
-
-    # return [
-    #     unique_ent
-    #     for unique_ent, unique_ent_ratio in zip(unique_ents, unique_ents_ratio)
-    #     if unique_ent_ratio >= threshold
-    # ]
+        if n_raters > 3
+        else []
+    )
 
 
 # Define a function for finding infrequent annotations (below certain threshold)
 def retrieve_infreq_ents(
     unique_ents, unique_ents_count, unique_ents_ratio, threshold, n_raters
 ):
-    if n_raters <= 5:
-        infreq_ents = []
-
-    if n_raters in [6, 7, 8]:
-        infreq_ents = [
+    return (
+        [
             unique_ent
             for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
-            if unique_ent_count <= 1
+            if unique_ent_count == 1
         ]
-
-    if n_raters > 8:
-        infreq_ents = [
-            unique_ent
-            for unique_ent, unique_ent_count in zip(unique_ents, unique_ents_count)
-            if unique_ent_count <= 2
-        ]
-
-    return infreq_ents
+        if n_raters > 5
+        else []
+    )
 
 
 # Function for determining whether two tokens occupy parts of the same span
