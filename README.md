@@ -114,12 +114,13 @@ bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 
 # Manually resolve the remaining conflicts in the streamlined data
-prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,PRODUCT,EVENT,LAW,LANGUAGE,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A # Note PRODUCT and LANGUAGE have been removed here
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 ```
+
 ### Creating gold-single
 ```bash
 # Define a better config with fine-tuning from transformer model (ask Kenneth)
@@ -207,3 +208,4 @@ The following values are also annotated in style similar to names:
 - 
 **Ents:**
 - 
+
