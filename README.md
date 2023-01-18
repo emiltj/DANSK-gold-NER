@@ -3,7 +3,10 @@
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
 - **Import data**
-    - Also merge the two sets for each rater (while in the db)
+    - Also merge the two sets for each rater
+- **Remove duplicates**
+    - Removing duplicates that matches on both 'meta' and on 'text' - only keep the last rated (from timestamp)
+    - No removal of duplicates matching only on 'text'
 - **Assess data**
     - Assessment of:
         - Interrater reliability 
@@ -68,6 +71,22 @@
 
 ## Repository pipeline implemented
 ### Creating gold-multi
+#all:
+bash tools/create_data_folders.sh
+python src/preprocessing/merge_and_rm_dupli.py
+bash tools/raters_to_db.sh -o 1
+bash tools/raters_from_db_to_spacy.sh
+bash tools/rm_raters_from_db.sh
+rm -r -f data/full/unprocessed/rater_2/*
+rm -r -f data/full/unprocessed/rater_10/*
+python src/preprocessing/rater_8_fix.py
+python src/preprocessing/rm_product_and_language.py
+python src/preprocessing/split_full_to_single_multi.py
+python src/preprocessing/streamline/streamline_multi.py
+bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
+bash tools/rm_raters_from_db.sh
+bash tools/raters_to_db.sh -p multi -d streamlined -o 0
+
 ```bash
 # Create folders for the data
 bash tools/create_data_folders.sh
