@@ -39,7 +39,7 @@ def convert_examples(
             "tokens": [get_token(token, token.i) for token in doc],
             "_is_binary": False,
             "_view_id": "ner_manual",
-            # "answer": "accept",
+            "answer": "accept",
             "_timestamp": 1635322276,
         }
         if include_ner:
