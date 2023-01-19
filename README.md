@@ -2,6 +2,9 @@
 
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
+```bash
+bash tools/create_data_folders.sh
+```
 - **Import data**
     - Also merge the two sets for each rater
 - **Remove duplicates**
@@ -52,7 +55,9 @@
                         - If no other ents exists in the same span for any rater (even partially)
                             - Delete ent (strict match) in all raters
 - **Manually resolve the remaining conflicts in the streamlined data**
-    - Save the gold-multi dataset
+    - Ignoring cases with doubt, and flagging them
+    - Save as 'gold-multi' in db
+- **
 - **Train a model on the gold-multi dataset**
     - Use contextual embeddings from a transformer model (see DaCy and ask Kenneth at this point)
 - **Predict on the single data for each rater**
@@ -88,7 +93,6 @@ bash tools/rm_raters_from_db.sh
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 
 ```bash
-# Create folders for the data
 bash tools/create_data_folders.sh
 ```
 
@@ -124,7 +128,7 @@ python src/preprocessing/rm_product_and_language.py
 python src/preprocessing/split_full_to_single_multi.py
 
 # Streamline the multi data by overwriting frequently tagged annotations to all raters data. Save as .spacy
-src/preprocessing/streamline/streamline_multi.ipynb
+python src/preprocessing/streamline/streamline_multi.py
 
 # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined
@@ -136,6 +140,7 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A # Note PRODUCT and LANGUAGE have been removed here
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
+bash tools/rm_raters_from_db.sh
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 ```

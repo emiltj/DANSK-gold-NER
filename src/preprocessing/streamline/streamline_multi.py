@@ -12,7 +12,7 @@ from spacy.training.corpus import Corpus
 from itertools import combinations
 from utils import *
 
-subset = False
+subset = True
 
 # Change cwd
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
@@ -76,7 +76,7 @@ for rater_idx in raters_idx:
     rater_docs = copy.deepcopy(data[rater_idx])
     for doc in unique_docs:
         if get_same_doc_index(doc, rater_docs) is None:
-            #print("Doc does not exist for rater")
+            pass  # print("Doc does not exist for rater")
         else:
             (
                 unique_ents_full_match,
