@@ -1,5 +1,23 @@
 # DANSK-gold-NER
 
+## Pipeline 'chunked up'
+```bash
+bash tools/create_data_folders.sh
+python src/preprocessing/merge_and_rm_dupli.py
+bash tools/raters_to_db.sh -o 1 # Add DANSK to database
+bash tools/raters_from_db_to_spacy.sh
+bash tools/rm_raters_from_db.sh
+rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 
+rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10
+python src/preprocessing/rater_8_fix.py # Fix rater 8 data
+python src/preprocessing/rm_product_and_language.py # Remove PRODUCT and LANGUAGE tags
+python src/preprocessing/split_full_to_single_multi.py
+python src/preprocessing/streamline/streamline_multi.py
+bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
+bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
+prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+```
+
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
 ```bash
@@ -21,7 +39,7 @@ python src/preprocessing/merge_and_rm_dupli.py
 - **Converting data to DocBins/.spacy files**
 ```bash
 bash tools/raters_to_db.sh -o 1 # Add DANSK to database
-bash tools/raters_from_db_to_spacy.sh #
+bash tools/raters_from_db_to_spacy.sh
 bash tools/rm_raters_from_db.sh
 ```
 
@@ -94,12 +112,21 @@ python src/preprocessing/split_full_to_single_multi.py
 python src/preprocessing/streamline/streamline_multi.py
 ```
 
+- **Adding streamlined data to database**
+    - First convert from .spacy to .jsonl
+bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
+bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
+
 
 - **Manually resolve conflicts in the streamlined data**
     - Ignoring cases with doubt, and flagging them (created a prodigy.json file enabling flagging)
+        - E.g. In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
+    - - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
     - Save as 'gold-multi' in db
     - LANGUAGE and PRODUCT are not included removed
     - Cases with no conflict are automatically accepted (-A)
+    
+    
 ```bash
 prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
@@ -163,6 +190,7 @@ prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split
 
 - **Save gold-dansk**
 
+
 ## Named Entity Recognition (NER) tagging guidelines
 
 This type of tagging is to determine what entities are present in a given text. There are 18 possible tags that can be used and the visual below describes them all. 
@@ -198,12 +226,6 @@ The following values are also annotated in style similar to names:
 
 ### Named Entity inconsistencies and the chosen way of resolvement
 #### Pipeline for resolving inconsistencies in which there is doubt, during the manual Prodigy review
-1. Internal dialogue with colleagues on the basis of predictions by https://huggingface.co/tner/roberta-large-ontonotes5 on a similar sentence in English
-2. Example is written down under "Examples", here below 
-
-#### Specific rules
-- In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
-- In cases where a doc with minimal context is provided and multiple tags may be appropriate, disregard the doc (no parking sign in Prodigy). E.g. 'Pande' might be tagged as verb or noun.
 
 #### Examples
 **Doc:**

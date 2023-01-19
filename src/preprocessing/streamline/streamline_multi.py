@@ -12,7 +12,7 @@ from spacy.training.corpus import Corpus
 from itertools import combinations
 from utils import *
 
-subset = True
+subset = False
 
 # Change cwd
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
