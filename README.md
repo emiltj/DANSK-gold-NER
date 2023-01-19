@@ -16,6 +16,7 @@ python src/preprocessing/streamline/streamline_multi.py
 bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
 prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+
 ```
 
 ## Repository pipeline
@@ -143,7 +144,7 @@ prodigy db-out gold-multi-all > data/multi/gold/gold-multi-flagged.jsonl --flagg
 ```
 
 - **Review the ignored, flagged cases after discussion with team**
-    - See predictions of a direct translation from the Roberta Large Ontonotes
+    - See predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5
     - Discuss with Kenneth/Rebekah/others
 ```bash
 # ????
@@ -161,8 +162,18 @@ prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 ```
 
+- **Get access to the Ontonotes NER data**
+    - Going to receive it from Rebekah or Kenneth
+
+- **Add the Ontonotes dataset to my gold-multi dataset**
+    - Or keep them separate, as long as the model can train on both on the same time
+
 - **Train a model on the gold-multi dataset**
-    - Use contextual embeddings from a transformer model (see DaCy and ask Kenneth at this point)
+    - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
+    - Change config to basic settings with GPU, DA, from https://spacy.io/usage/training#quickstart
+    - Train it on UCLOUD (Ask Kenneth how to set up GPU)
+    - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
+
 ```bash
 # python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
 ```
