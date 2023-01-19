@@ -5,33 +5,69 @@
 ```bash
 bash tools/create_data_folders.sh
 ```
-- **Import data**
-    - Also merge the two sets for each rater
-- **Remove duplicates**
+
+- **Download data**
+```bash
+Download DANSK, unzip and place unzipped folder in data/
+```
+
+- **Merge original data and remove duplicates**
     - Removing duplicates that matches on both 'meta' and on 'text' - only keep the last rated (from timestamp)
     - No removal of duplicates matching only on 'text'
+```bash
+python src/preprocessing/merge_and_rm_dupli.py
+```
+
+- **Converting data to DocBins/.spacy files**
+```bash
+bash tools/raters_to_db.sh -o 1 # Add DANSK to database
+bash tools/raters_from_db_to_spacy.sh #
+bash tools/rm_raters_from_db.sh
+```
+
 - **Assess data**
     - Assessment of:
         - Interrater reliability 
         - Annotations for the different raters
-        - Number of raters for each unique doc
+        - Number of raters for each unique doc (later stage, not now actually)
         - Duplicates
     - Current findings: 
         - Poor annotations from rater 2
         - Poor annotations from rater 10
         - Rater 8 annotates "man", "sig selv" as PER ents
         - No tags for LANGUAGE, and very poor tagging for PRODUCT
+```bash
+# src/data_assessment/n_duplicates_for_files.ipynb
+# src/data_assessment/interrater_reliability/interrater_reliability.ipynb
+```
+
 - **Make appropriate changes in accordance with the the assesment of the raters**
     - Cut away rater 2
     - Cut away rater 10
     - For rater 8:
         - Exclude all PER annotations if the individual tokens.is_stop = True
     - Remove all ents with LANGUAGE and PRODUCT
+```bash
+rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 
+rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10
+python src/preprocessing/rater_8_fix.py # Fix rater 8 data
+python src/preprocessing/rm_product_and_language.py # Remove PRODUCT and LANGUAGE tags
+```
+
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
+    - Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
+```bash
+python src/preprocessing/split_full_to_single_multi.py
+```
+
 - **Investigate the distribution of the number of raters for the multi data**
     - Roughly 25% of multi docs have been rated by 2 raters
     - Roughly 25% of multi docs have been rated by 10 raters
     - Roughly 50% of multi docs have been rated by >2 and <10
+```bash
+# src/data_assessment/n_raters_for_each_doc.ipynb
+```
+
 - **Streamline the multi data, automatically accepting highly frequent annotations while rejecting highly infrequent annotations**
     - Reason: If there are e.g. 3 raters for a doc, then a 20% freq threshold for frequent ents is too low. But for 7 raters it is fine.
     - For each rater:
@@ -54,25 +90,79 @@ bash tools/create_data_folders.sh
                     - If a ent/span has been annotated by 1 rater (Exact match as defined by https://pypi.org/project/nervaluate/ meaning that the span is the same, but tag can differ) and no other annotations overlap then:
                         - If no other ents exists in the same span for any rater (even partially)
                             - Delete ent (strict match) in all raters
-- **Manually resolve the remaining conflicts in the streamlined data**
-    - Ignoring cases with doubt, and flagging them
+```bash
+python src/preprocessing/streamline/streamline_multi.py
+```
+
+
+- **Manually resolve conflicts in the streamlined data**
+    - Ignoring cases with doubt, and flagging them (created a prodigy.json file enabling flagging)
     - Save as 'gold-multi' in db
-- **
+    - LANGUAGE and PRODUCT are not included removed
+    - Cases with no conflict are automatically accepted (-A)
+```bash
+prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+```
+
+- **Export the gold-multi-no-flagged cases**
+```bash
+python src/preprocessing/filter_only_non_flagged.py
+prodigy db-out gold-multi-no-flagged > data/multi/gold/gold-multi-no-flagged.jsonl
+```
+
+- **Export the ignored, flagged cases**
+```bash
+prodigy db-out gold-multi-all > data/multi/gold/gold-multi-flagged.jsonl --flagged-only
+```
+
+- **Review the ignored, flagged cases after discussion with team**
+    - See predictions of a direct translation from the Roberta Large Ontonotes
+    - Discuss with Kenneth/Rebekah/others
+```bash
+# ????
+```
+
+- **Merge the gold-multi-no-flagged and the gold-multi-flagged
+```bash
+prodigy db-merge gold-multi-flagged,gold-multi-no-flagged gold-multi
+```
+
+- **Export the gold-multi dataset to local machine**
+    - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
+```bash
+prodigy db-out gold-multi data/multi/gold
+prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
+```
+
 - **Train a model on the gold-multi dataset**
     - Use contextual embeddings from a transformer model (see DaCy and ask Kenneth at this point)
+```bash
+# python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
+```
+
 - **Predict on the single data for each rater**
     - In a script
+
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent.
+
 - **Potentially. Make appropriate changes on gold-standard-multi data on the basement of assessment between rater and model**
+
 - **Potentially. Re-train model on new gold-standard-multi data**
+
 - **Potentially. Re-predict on single data for each rater**
+
 - **Potentially. Re-assess agreement between rater and model**
+
 - **Potentially. Repeat above process**
+
 - **Manually resolve conflicts in single data (between model predictions and annotators)**
     - Save the gold-single dataset
+
 - **Merge gold-single and gold-multi dataset into gold-dansk**
+
 - **Save gold-dansk**
+
 
 ## Repository pipeline implemented
 ### Creating gold-multi
@@ -101,6 +191,7 @@ Download DANSK, unzip and place unzipped folder in data/
 ```bash
 # Merge original data sources from each rater, and remove duplicates (matching on meta and on text) - only keep the last rated (from timestamp)
 python src/preprocessing/merge_and_rm_dupli.py
+```
 
 # Add DANSK to database
 bash tools/raters_to_db.sh -o 1
@@ -140,7 +231,6 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0
 prodigy review gold-multi rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A # Note PRODUCT and LANGUAGE have been removed here
 
 # Export the gold-multi dataset to local machine, both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
-bash tools/rm_raters_from_db.sh
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 ```
