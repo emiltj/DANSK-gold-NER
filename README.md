@@ -140,6 +140,8 @@ prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,ra
 python src/preprocessing/split_by_answer.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
 
+# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
+
 - **Review the ignored cases after discussion with team**
     - See predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5
     - Discuss with Kenneth/Rebekah/others
@@ -201,6 +203,7 @@ prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split
 
 - **Save gold-dansk**
 
+- **Save all gold-multi-ignored and gold-single-ignored (both prior to resolvement), in order for me to be able to get back to it at a later stage for the methods section.
 
 ## Named Entity Recognition (NER) tagging guidelines
 

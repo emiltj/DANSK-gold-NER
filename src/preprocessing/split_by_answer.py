@@ -3,6 +3,7 @@ import srsly
 
 db = connect()
 examples = db.get_dataset("gold-multi-all")
+srsly.write_jsonl("./data/multi/gold/gold-multi-all.jsonl", examples)
 
 accepted = [e for e in examples if e["answer"] == "accept"]
 srsly.write_jsonl("./data/multi/gold/gold-multi-accepted.jsonl", accepted)
