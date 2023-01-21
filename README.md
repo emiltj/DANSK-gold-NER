@@ -162,8 +162,11 @@ prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 ```
 
-- **Get access to the Ontonotes NER data**
+- **Get access to the Ontonotes NER data in Conll-u format**
     - Going to receive it from Rebekah or Kenneth
+
+- **Convert ontonotes to .spacy**
+    - Using spacy's convert functionality
 
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
