@@ -16,6 +16,11 @@ python src/preprocessing/streamline/streamline_multi.py
 bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
 prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+python src/preprocessing/split_by_answer.py
+prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE
+prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
+prodigy db-out gold-multi data/multi/gold
+prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
 
 ```
 
@@ -120,39 +125,31 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined da
 
 
 - **Manually resolve conflicts in the streamlined data**
-    - Ignoring cases with doubt, and flagging them (created a prodigy.json file enabling flagging)
+    - Ignoring cases with doubt (and writing them down, to later discuss with team)
         - E.g. In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
     - - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
-    - Save as 'gold-multi' in db
+    - Save as 'gold-multi-all' in db
     - LANGUAGE and PRODUCT are not included removed
     - Cases with no conflict are automatically accepted (-A)
-    
-    
 ```bash
 prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
 
-- **Export the gold-multi-no-flagged cases**
+- **Export the gold-multi-ignored and the gold-multi-accepted cases**
 ```bash
-python src/preprocessing/filter_only_non_flagged.py
-prodigy db-out gold-multi-no-flagged > data/multi/gold/gold-multi-no-flagged.jsonl
+python src/preprocessing/split_by_answer.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
 
-- **Export the ignored, flagged cases**
-```bash
-prodigy db-out gold-multi-all > data/multi/gold/gold-multi-flagged.jsonl --flagged-only
-```
-
-- **Review the ignored, flagged cases after discussion with team**
+- **Review the ignored cases after discussion with team**
     - See predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5
     - Discuss with Kenneth/Rebekah/others
 ```bash
-# ????
+prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE
 ```
 
-- **Merge the gold-multi-no-flagged and the gold-multi-flagged
+- **Merge the gold-multi-ignored-resolved and the gold-multi-accepted
 ```bash
-prodigy db-merge gold-multi-flagged,gold-multi-no-flagged gold-multi
+prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 ```
 
 - **Export the gold-multi dataset to local machine**
@@ -163,7 +160,7 @@ prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
-    - Going to receive it from Rebekah or Kenneth
+    - See Slack w. Kenneth
 
 - **Convert ontonotes to .spacy**
     - Using spacy's convert functionality
