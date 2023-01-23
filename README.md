@@ -181,9 +181,25 @@ python -m spacy convert <inputfile> --converter conllu
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
 
-- **Train a model on the gold-multi dataset**
-    - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
+- **Specify a config for the training**
     - Change config to basic settings with GPU, DA, from https://spacy.io/usage/training#quickstart
+    - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
+
+- **Setup Ucloud for GPU-use**
+    - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
+    - Clone this repo 
+    - Run below code
+1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
+2. Insert SSH-key *ucloud_setup/key_for_ucloud.txt*
+3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
+3. Run below bash lines
+```bash
+git clone https://github.com/emiltj/DANSK-gold-NER.git
+bash server_dependencies.sh
+bash cuda_dependencies
+```
+
+- **Train a model on the gold-multi dataset**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
 
