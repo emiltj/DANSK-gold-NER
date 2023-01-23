@@ -21,8 +21,16 @@ prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id re
 prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
-
 ```
+Move to UCLOUD
+0. Clone this repo 
+```bash
+Run following code:
+git clone https://github.com/emiltj/DANSK-gold-NER.git
+bash server_dependencies.sh
+bash cuda_dependencies
+```
+
 
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
@@ -166,6 +174,9 @@ prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split
 
 - **Convert ontonotes to .spacy**
     - Using spacy's convert functionality
+```bash
+python -m spacy convert <inputfile> --converter conllu
+```
 
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
