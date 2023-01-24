@@ -157,6 +157,15 @@ python src/preprocessing/split_by_answer.py # Retrieve all ignored and accepted 
 prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE
 ```
 
+- **Dump the gold-multi-ignored-resolved**
+```bash
+prodigy db-out gold-multi-ignored-resolved data/multi/gold
+````
+
+- **Write down the gold-multi-ignored-resolved cases**
+    - Specify what the "correct" annotation ended up being chosen. Perhaps specifying some rules that we implement forr edge cases. Save inn file 'edge-cases.txt'
+
+
 - **Merge the gold-multi-ignored-resolved and the gold-multi-accepted
 ```bash
 prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
