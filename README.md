@@ -160,11 +160,14 @@ prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id re
 - **Dump the gold-multi-ignored-resolved**
 ```bash
 prodigy db-out gold-multi-ignored-resolved data/multi/gold
-````
+```
 
 - **Write down the gold-multi-ignored-resolved cases**
-    - Specify what the "correct" annotation ended up being chosen. Perhaps specifying some rules that we implement forr edge cases. Save inn file 'edge-cases.txt'
-
+    - Retrieve the ignored cases as text with annotations (using prodigy print-dataset)
+    - Save retrieved ignored cases to 'edge-cases.txt'
+```bash
+prodigy print-dataset gold-multi-ignored-resolved
+```
 
 - **Merge the gold-multi-ignored-resolved and the gold-multi-accepted
 ```bash

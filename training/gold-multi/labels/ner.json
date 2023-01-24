@@ -1,0 +1,77 @@
+{
+  "0":{
+
+  },
+  "1":{
+    "WORK OF ART":173,
+    "PERSON":162,
+    "DATE":85,
+    "ORGANIZATION":67,
+    "CARDINAL":61,
+    "NORP":45,
+    "GPE":30,
+    "FACILITY":20,
+    "LAW":16,
+    "MONEY":15,
+    "EVENT":14,
+    "TIME":8,
+    "QUANTITY":8,
+    "ORDINAL":8,
+    "LOCATION":3
+  },
+  "2":{
+    "WORK OF ART":173,
+    "PERSON":162,
+    "DATE":85,
+    "ORGANIZATION":67,
+    "CARDINAL":61,
+    "NORP":45,
+    "GPE":30,
+    "FACILITY":20,
+    "LAW":16,
+    "MONEY":15,
+    "EVENT":14,
+    "TIME":8,
+    "QUANTITY":8,
+    "ORDINAL":8,
+    "LOCATION":3
+  },
+  "3":{
+    "WORK OF ART":173,
+    "PERSON":162,
+    "DATE":85,
+    "ORGANIZATION":67,
+    "CARDINAL":61,
+    "NORP":45,
+    "GPE":30,
+    "FACILITY":20,
+    "LAW":16,
+    "MONEY":15,
+    "EVENT":14,
+    "TIME":8,
+    "QUANTITY":8,
+    "ORDINAL":8,
+    "LOCATION":3
+  },
+  "4":{
+    "WORK OF ART":173,
+    "PERSON":162,
+    "DATE":85,
+    "ORGANIZATION":67,
+    "CARDINAL":61,
+    "NORP":45,
+    "GPE":30,
+    "FACILITY":20,
+    "LAW":16,
+    "MONEY":15,
+    "EVENT":14,
+    "TIME":8,
+    "QUANTITY":8,
+    "ORDINAL":8,
+    "LOCATION":3,
+    "":1
+  },
+  "5":{
+    "":1
+  }
+}
