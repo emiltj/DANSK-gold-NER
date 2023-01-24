@@ -166,7 +166,7 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
     - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 ```bash
 prodigy db-out gold-multi data/multi/gold
-prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
+prodigy data-to-spacy training/gold-multi/ --ner gold-multi --lang "da" --eval-split .2
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
