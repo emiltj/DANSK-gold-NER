@@ -148,8 +148,6 @@ prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,ra
 python src/preprocessing/split_by_answer.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
 
-# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
-
 - **Review the ignored cases after discussion with team**
     - See predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5
     - Discuss with Kenneth/Rebekah/others
@@ -193,6 +191,8 @@ https://huggingface.co/datasets/tner/ontonotes5
 src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
 ```
+
+# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
 
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
