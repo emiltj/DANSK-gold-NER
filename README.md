@@ -182,12 +182,16 @@ prodigy data-to-spacy training/gold-multi/ --ner gold-multi --lang "da" --eval-s
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
-    - See Slack w. Kenneth
+    - See Slack w. Kenneth - got message
+https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
+
+https://huggingface.co/datasets/tner/ontonotes5
 
 - **Convert ontonotes to .spacy**
     - Using spacy's convert functionality
 ```bash
-python -m spacy convert <inputfile> --converter conllu
+src/preprocessing/get_ontonotes_spacy_format.py
+#python -m spacy convert <inputfile> --converter conllu
 ```
 
 - **Add the Ontonotes dataset to my gold-multi dataset**
@@ -214,16 +218,15 @@ bash cuda_dependencies
 - **Train a model on the gold-multi dataset**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
-
 ```bash
 # python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
 ```
 
 - **Predict on the single data for each rater**
-    - In a script
+    - In a script, locally
 
 - **Assess agreement between rater and model**
-    - Make assessment fine-grained, and assess for each type of ent.
+    - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
 
 - **Potentially. Make appropriate changes on gold-standard-multi data on the basement of assessment between rater and model**
 
@@ -242,7 +245,10 @@ bash cuda_dependencies
 
 - **Save gold-dansk**
 
-- **Save all gold-multi-ignored and gold-single-ignored (both prior to resolvement), in order for me to be able to get back to it at a later stage for the methods section.
+- **Save all gold-multi-ignored and gold-single-ignored (both prior to resolvement), in order for me to be able to get back to it at a later stage for the methods section.**
+
+- **Train a NER model on the gold-dansk and package it**
+    - Everything must be done on UCloud as packaging can't be done locally
 
 ## Named Entity Recognition (NER) tagging guidelines
 
