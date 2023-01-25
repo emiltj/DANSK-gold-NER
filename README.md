@@ -228,7 +228,7 @@ bash cuda_dependencies
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
 
-- **Potentially. Make appropriate changes on gold-standard-multi data on the basement of assessment between rater and model**
+- **Potentially. Make appropriate changes on gold-standard-multi data based on the assessment between rater and model**
 
 - **Potentially. Re-train model on new gold-standard-multi data**
 
