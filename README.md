@@ -197,8 +197,6 @@ src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
 ```
 
-# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
-
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
 
@@ -206,6 +204,7 @@ src/preprocessing/get_ontonotes_spacy_format.py
     - Change config to basic settings with GPU, DA, from https://spacy.io/usage/training#quickstart
     - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
 
+# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
 - **Setup Ucloud for GPU-use**
     - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
     - Clone this repo
@@ -225,6 +224,9 @@ cd DANSK-gold-NER/gold-multi-training/ucloud_setup
 bash cuda_dependencies.sh
 cd ..
 ```
+
+- **Transfer data to UCLOUD**
+- train.spacy, gold-multi-dev.spacy to ucloud in the folder "gold-multi-training"
 
 - **Train a model on the gold-multi dataset**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
