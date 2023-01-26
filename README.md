@@ -221,8 +221,15 @@ git clone https://github.com/emiltj/DANSK-gold-NER.git
 cd DANSK-gold-NER/gold-multi-training
 bash ucloud_setup/server_dependencies.sh
 cd DANSK-gold-NER/gold-multi-training/ucloud_setup
-bash cuda_dependencies.sh
-cd ..
+python3 -m venv environments/training
+source environments/training/bin/activate
+pip install numpy
+pip install spacy
+pip install spacy-transformers
+#pip install torch
+#pip install -r "requirements_training.txt"
+#pip install torch==1.8.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+#pip install spacy[cuda101]
 ```
 
 - **Transfer data to UCLOUD**
@@ -232,7 +239,7 @@ cd ..
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
 ```bash
-python -m spacy train config_trf.cfg --paths.train train.spacy --paths.dev gold-multi-dev.spacy --output output --gpu-id 0
+python -m spacy train config_gpu.cfg --paths.train gold-multi-train.spacy --paths.dev gold-multi-dev.spacy --output output #--gpu-id 0
 ```
 
 - **Predict on the single data for each rater**
