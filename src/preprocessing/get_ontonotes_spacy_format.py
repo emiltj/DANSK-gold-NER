@@ -40,3 +40,4 @@ db = DocBin()
 for doc in ontonotes_docs:
     db.add(doc)
 db.to_disk("data/ontonotes/ontonotes.spacy")
+db.to_disk("gold-multi-training/ontonotes.spacy")

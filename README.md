@@ -176,14 +176,19 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
     - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 ```bash
 prodigy db-out gold-multi data/multi/gold
-prodigy data-to-spacy training/gold-multi/ --ner gold-multi --lang "da" --eval-split .2
+prodigy data-to-spacy gold-multi-training/ --ner gold-multi --lang "da" --eval-split 0
+mv gold-multi-training/train.spacy gold-multi-training/gold-multi-full.spacy
+prodigy data-to-spacy gold-multi-training/ --ner gold-multi --lang "da" --eval-split .2
+mv gold-multi-training/train.spacy gold-multi-training/gold-multi-train.spacy
+mv gold-multi-training/dev.spacy gold-multi-training/gold-multi-dev.spacy
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
     - See Slack w. Kenneth - got message
-https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
+    - Await answer from Stephan
+    - https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
+    - https://huggingface.co/datasets/tner/ontonotes5
 
-https://huggingface.co/datasets/tner/ontonotes5
 
 - **Convert ontonotes to .spacy**
     - Using spacy's convert functionality
@@ -206,8 +211,8 @@ src/preprocessing/get_ontonotes_spacy_format.py
     - Clone this repo 
     - Run below code
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
-2. Insert SSH-key *ucloud_setup/key_for_ucloud.txt*
-3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
+2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
+3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/gold-multi-training/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
 3. Run below bash lines
 ```bash
 git clone https://github.com/emiltj/DANSK-gold-NER.git
