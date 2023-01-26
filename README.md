@@ -213,18 +213,24 @@ src/preprocessing/get_ontonotes_spacy_format.py
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
 2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
 3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/gold-multi-training/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
-3. Run below bash lines
+4. Add to first recommended
+5. Reload remote
+6. Connect in current window
+7. Run below bash lines
 ```bash
 git clone https://github.com/emiltj/DANSK-gold-NER.git
-bash server_dependencies.sh
-bash cuda_dependencies
+cd DANSK-gold-NER/gold-multi-training
+bash ucloud_setup/server_dependencies.sh
+cd DANSK-gold-NER/gold-multi-training/ucloud_setup
+bash cuda_dependencies.sh
+cd ..
 ```
 
 - **Train a model on the gold-multi dataset**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
 ```bash
-# python -m spacy train data/multi/gold/config.cfg --paths.train data/multi/gold/train.spacy --paths.dev data/multi/gold/dev.spacy --output data/multi/gold/output
+python -m spacy train config_trf.cfg --paths.train train.spacy --paths.dev gold-multi-dev.spacy --output output
 ```
 
 - **Predict on the single data for each rater**
