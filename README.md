@@ -208,7 +208,7 @@ src/preprocessing/get_ontonotes_spacy_format.py
 
 - **Setup Ucloud for GPU-use**
     - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
-    - Clone this repo 
+    - Clone this repo
     - Run below code
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
 2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
@@ -230,7 +230,7 @@ cd ..
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
 ```bash
-python -m spacy train config_trf.cfg --paths.train train.spacy --paths.dev gold-multi-dev.spacy --output output
+python -m spacy train config_trf.cfg --paths.train train.spacy --paths.dev gold-multi-dev.spacy --output output --gpu-id 0
 ```
 
 - **Predict on the single data for each rater**
