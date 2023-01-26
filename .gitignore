@@ -1,4 +1,4 @@
 data/
 for_another_repo/
 DANSK_link.txt
-training/*/*.spacy
+gold-multi-training/*.spacy
