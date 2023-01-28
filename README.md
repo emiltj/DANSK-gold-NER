@@ -197,6 +197,13 @@ src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
 ```
 
+# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
+
+- **Remove ents with language and product from Ontonotes (to match DANSK)**
+```bash
+src/preprocessing/ontonotes_filter_tags.py
+```
+
 - **Add the Ontonotes dataset to my gold-multi dataset**
     - Or keep them separate, as long as the model can train on both on the same time
 
@@ -204,7 +211,6 @@ src/preprocessing/get_ontonotes_spacy_format.py
     - Change config to basic settings with GPU, DA, from https://spacy.io/usage/training#quickstart
     - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
 
-# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
 - **Setup Ucloud for GPU-use**
     - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
     - Clone this repo
@@ -220,8 +226,8 @@ src/preprocessing/get_ontonotes_spacy_format.py
 git clone https://github.com/emiltj/DANSK-gold-NER.git
 cd DANSK-gold-NER/gold-multi-training
 bash ucloud_setup/server_dependencies.sh
-cd DANSK-gold-NER/gold-multi-training/ucloud_setup
-python3 -m venv environments/training
+cd DANSK-gold-NER/gold-multi-training
+python3 -m venv ucloud_setup/environments/training
 source environments/training/bin/activate
 pip install numpy==1.23.3
 pip install spacy

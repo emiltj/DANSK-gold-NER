@@ -2,7 +2,7 @@ from datasets import load_dataset
 from spacy.tokens import Doc, DocBin
 import spacy
 import json, os
-from src.preprocessing.spacemodel import SpaceModel, load_books, load_texts
+from src.preprocessing.spacemodel import SpaceModel, load_texts
 
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
