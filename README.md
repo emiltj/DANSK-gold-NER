@@ -239,6 +239,7 @@ pip install spacy-transformers
 pip install torch
 pip install spacy[cuda101]
 wandb login
+# insert API-key from https://wandb.ai/settings
 #pip install -r "requirements_training.txt"
 #pip install torch==1.8.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
