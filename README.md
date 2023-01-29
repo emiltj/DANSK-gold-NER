@@ -250,6 +250,7 @@ wandb login
 - **Train 3 models on the gold-multi dataset (or on a combination of ontonotes also)**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
+    - Try different batch-sizes (see that it runs, then shut it down) -> the larger batch-size the better
 ```bash
 python -m spacy train configs/config_gpu.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
 
@@ -297,6 +298,7 @@ prodigy db-merge rater_1_single_gold,gold-multi-train_???maybe_ontoifitisbest? g
 
 - **Train a new model**
 
+
 - **Predict on the single data for each rater**
     - In a script, locally
 
@@ -322,8 +324,14 @@ prodigy db-merge rater_1_single_gold,gold-multi-train_???maybe_ontoifitisbest? g
 
 - **Save all gold-multi-ignored and gold-single-ignored (both prior to resolvement), in order for me to be able to get back to it at a later stage for the methods section.**
 
+- **Gain access to Huggingface account centre-for-humanities-computing**
+
 - **Train a NER model on the gold-dansk and package it**
     - Everything must be done on UCloud as packaging can't be done locally
+    - Ensure that relevant information on Weights and Biases (wandb) is saved so I can use for report. 
+    https://docs.wandb.ai/guides/integrations/spacy
+    - Packaging to centre-for-humanities-computing
+
 
 ## Named Entity Recognition (NER) tagging guidelines
 
