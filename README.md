@@ -253,6 +253,8 @@ wandb login
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
     - Try different batch-sizes (see that it runs, then shut it down) -> the larger batch-size the better
 ```bash
+cd gold-multi-training
+
 python -m spacy train configs/config_gpu.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
 
 python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
