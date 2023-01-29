@@ -4,3 +4,5 @@ DANSK_link.txt
 gold-multi-training/*/*.spacy
 gold-multi-training/wandb/
 gold-multi-training/output/model-*
+gold-multi-training/models
+gold-multi-training/packages

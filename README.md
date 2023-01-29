@@ -267,9 +267,9 @@ python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gol
 - **Assess which model is best**
     - Manually go through these metrics
 ```bash
-python -m spacy evaluate models/dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json
-python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json
-python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json
+python -m spacy evaluate models/dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json --gpu-id 0
+python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json --gpu-id 0
+python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json --gpu-id 0
 ```
 
 - **Download best model to local**
