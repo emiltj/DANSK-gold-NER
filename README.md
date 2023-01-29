@@ -272,6 +272,12 @@ python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-d
 python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json --gpu-id 0
 ```
 
+- **Package models**
+```bash
+python -m spacy package models/dansk-alone/model-best/ packages/dansk-alone
+python -m spacy package models/dansk-and-onto/model-best/ packages/dansk-and-onto
+```
+
 - **Download best model to local**
     - Into same folder
 
