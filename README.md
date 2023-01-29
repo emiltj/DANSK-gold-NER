@@ -255,6 +255,8 @@ wandb login
 ```bash
 cd gold-multi-training
 
+source ucloud_setup/environments/training/bin/activate
+
 python -m spacy train configs/config_gpu.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
 
 python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
