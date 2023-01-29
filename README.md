@@ -176,11 +176,11 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
     - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 ```bash
 prodigy db-out gold-multi data/multi/gold
-prodigy data-to-spacy gold-multi-training/ --ner gold-multi --lang "da" --eval-split 0
-mv gold-multi-training/train.spacy gold-multi-training/gold-multi-full.spacy
-prodigy data-to-spacy gold-multi-training/ --ner gold-multi --lang "da" --eval-split .2
-mv gold-multi-training/train.spacy gold-multi-training/gold-multi-train.spacy
-mv gold-multi-training/dev.spacy gold-multi-training/gold-multi-dev.spacy
+prodigy data-to-spacy gold-multi-training/datasets/ --ner gold-multi --lang "da" --eval-split 0
+mv gold-multi-training/datasets/train.spacy gold-multi-training/datasets/gold-multi-full.spacy
+prodigy data-to-spacy gold-multi-training/datasets/ --ner gold-multi --lang "da" --eval-split .2
+mv gold-multi-training/datasets/train.spacy gold-multi-training/datasets/gold-multi-train.spacy
+mv gold-multi-training/datasets/dev.spacy gold-multi-training/datasets/gold-multi-dev.spacy
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
@@ -193,23 +193,26 @@ mv gold-multi-training/dev.spacy gold-multi-training/gold-multi-dev.spacy
 - **Convert ontonotes to .spacy**
     - Using spacy's convert functionality
 ```bash
-src/preprocessing/get_ontonotes_spacy_format.py
+python src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
 ```
 
-# HAVE DONE ABOVE, HAVE GOTTEN TO HERE:
-
 - **Remove ents with language and product from Ontonotes (to match DANSK)**
 ```bash
-src/preprocessing/ontonotes_filter_tags.py
+python src/preprocessing/ontonotes_filter_tags.py
 ```
 
-- **Add the Ontonotes dataset to my gold-multi dataset**
-    - Or keep them separate, as long as the model can train on both on the same time
+- **Merge ontonotes with gold-multi-train**
+    - Both duplicating the gold-multi-train to have same weight, but also just with the original size
+```bash
+python gold-multi-training/datasets/merge_multi_ontonotes.py
+```
 
 - **Specify a config for the training**
     - Change config to basic settings with GPU, DA, from https://spacy.io/usage/training#quickstart
-    - Use the rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
+    - Add wandb for later tracking
+    - Change to KennethEnevoldsen/dfm-bert-large-v1-2048bsz-1Msteps, which has highest performance, given scandeval.
+    - Also maybe try: the google rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
 
 - **Setup Ucloud for GPU-use**
     - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
@@ -231,22 +234,45 @@ python3 -m venv ucloud_setup/environments/training
 source environments/training/bin/activate
 pip install numpy==1.23.3
 pip install spacy
+pip install wandb
 pip install spacy-transformers
 pip install torch
 pip install spacy[cuda101]
+wandb login
 #pip install -r "requirements_training.txt"
 #pip install torch==1.8.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 - **Transfer data to UCLOUD**
-- train.spacy, gold-multi-dev.spacy to ucloud in the folder "gold-multi-training"
+    - Manual transfer of:
+    - gold-multi-dev.spacy, onto_and_gold_multi_train.spacy, gold-multi-full.spacy, onto_and_gold_multi_train_dupli.spacy, gold-multi-train.spacy, ontonotes.spacy to ucloud in the folder "gold-multi-training/datasets"
 
-- **Train a model on the gold-multi dataset**
+- **Train 3 models on the gold-multi dataset (or on a combination of ontonotes also)**
     - Train it on UCLOUD (Ask Kenneth how to set up GPU)
     - Use the spacy -m train to train a new head for the transformer to NER on gold-multi and Ontonotes
 ```bash
-python -m spacy train config_gpu.cfg --paths.train gold-multi-train.spacy --paths.dev gold-multi-dev.spacy --output output --gpu-id 0
+python -m spacy train configs/config_gpu.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
+
+python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
+
+python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-onto --gpu-id 0
 ```
+
+- **Assess which model is best**
+    - Manually go through these metrics
+```bash
+python -m spacy evaluate dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json
+python -m spacy evaluate dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json
+python -m spacy evaluate dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json
+```
+
+- **Download best model to local**
+    - Into 
+
+- **Use model to predict the rater with highest agreement with others**
+    - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
+    - I chose rater 1
+
 
 - **Predict on the single data for each rater**
     - In a script, locally

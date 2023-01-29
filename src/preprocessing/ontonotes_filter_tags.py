@@ -1,8 +1,6 @@
-from datasets import load_dataset
-from spacy.tokens import Doc, DocBin
+from spacy.tokens import DocBin
 import spacy
 import os
-from src.preprocessing.spacemodel import SpaceModel, load_books, load_texts
 
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
@@ -34,5 +32,5 @@ for doc in docs:
     db.add(doc)
 
 # Overwrite existing files
-db.to_disk("gold-multi-training/ontonotes.spacy")
+db.to_disk("gold-multi-training/datasets/ontonotes.spacy")
 db.to_disk("data/ontonotes/ontonotes.spacy")

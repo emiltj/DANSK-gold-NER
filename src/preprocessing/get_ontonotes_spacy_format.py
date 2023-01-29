@@ -2,7 +2,7 @@ from datasets import load_dataset
 from spacy.tokens import Doc, DocBin
 import spacy
 import json, os
-from src.preprocessing.spacemodel import SpaceModel, load_texts
+from spacemodel import SpaceModel, load_texts
 
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
@@ -34,10 +34,11 @@ for ontonotes_dict in ontonotes_dicts:
     ontonotes_docs.append(doc)
 
 # Dump ontonotes in docbin format
-os.mkdir("data/ontonotes")
+if not os.path.exists("data/ontonotes"):
+    os.mkdir("data/ontonotes")
 
 db = DocBin()
 for doc in ontonotes_docs:
     db.add(doc)
 db.to_disk("data/ontonotes/ontonotes.spacy")
-db.to_disk("gold-multi-training/ontonotes.spacy")
+db.to_disk("gold-multi-training/datasets/ontonotes.spacy")
