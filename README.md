@@ -279,7 +279,6 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
 - **Use model to predict the rater with highest agreement with others**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
-    - Predictions
 ```bash
 ???
 ```
@@ -290,8 +289,13 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
 prodigy review rater_1_single_gold rater_single_unprocessed_1,*MODEL_PREDICTIONS???*, --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
 
-- **A
+- **Add this data to a new training dataset**
+```bash
+prodigy db-in gold-multi-train_???maybe_ontoifitisbest?? gold-multi-training/datasets/onto_and_gold_multi_train.spacy
+prodigy db-merge rater_1_single_gold,gold-multi-train_???maybe_ontoifitisbest? gold-multi-train-and-rater1_resolved
+```
 
+- **Train a new model**
 
 - **Predict on the single data for each rater**
     - In a script, locally
