@@ -261,17 +261,36 @@ python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gol
 - **Assess which model is best**
     - Manually go through these metrics
 ```bash
-python -m spacy evaluate dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json
-python -m spacy evaluate dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json
-python -m spacy evaluate dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json
+python -m spacy evaluate models/dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json
+python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json
+python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json
 ```
 
 - **Download best model to local**
-    - Into 
+    - Into same folder
+
+- **Load single-unprocessed into database**
+```bash 
+cd DANSK-gold-ner
+bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed # Convert the unprocessed single from .spacy to .jsonl
+bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed single data to the prodigy database
+```
 
 - **Use model to predict the rater with highest agreement with others**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
+    - Predictions
+```bash
+???
+```
+
+- **Resolve differences between rater 1 and first_best_model**
+    - Save to data/single/gold/rater_1
+```bash
+prodigy review rater_1_single_gold rater_single_unprocessed_1,*MODEL_PREDICTIONS???*, --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+```
+
+- **A
 
 
 - **Predict on the single data for each rater**

@@ -25,7 +25,6 @@ mkdir ./data/single/gold/combined/
 for i in {1..10}
 do
     mkdir ./data/single/gold/rater_$i/
-    rm -r ./data/single/gold/rater_$i/
     rm -r ./data/single/streamlined/rater_$i/
 done
 
