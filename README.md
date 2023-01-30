@@ -229,6 +229,8 @@ bash ucloud_setup/server_dependencies.sh
 cd DANSK-gold-NER/gold-multi-training
 python3 -m venv ucloud_setup/environments/training
 source ucloud_setup/environments/training/bin/activate
+pip install wheel
+pip install wheels
 pip install numpy==1.23.3
 pip install spacy
 pip install wandb
