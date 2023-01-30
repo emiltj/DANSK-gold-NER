@@ -1,0 +1,5 @@
+import spacy
+
+nlp = spacy.load(
+    "../../gold-multi-training/packages/dansk-dupli-and-onto/da_pipeline-0.0.0"
+)

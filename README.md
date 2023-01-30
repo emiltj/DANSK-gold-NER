@@ -215,9 +215,6 @@ python gold-multi-training/datasets/merge_multi_ontonotes.py
     - Also maybe try: the google rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
 
 - **Setup Ucloud for GPU-use**
-    - Open UCloud instance ( https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04 )
-    - Clone this repo
-    - Run below code
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
 2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
 3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/gold-multi-training/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
