@@ -1,17 +1,21 @@
 import spacy, os
 from spacy.tokens import DocBin
 
+
 # Change dir
 os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 # Load rater_1 data
 db = DocBin()
-r1 = db.from_disk("data/single/unprocessed/rater_1/data.spacy")
+r1 = db.from_disk("data/single/unprocessed/rater_1/train.spacy")
 nlp = spacy.blank("da")
 r1_docs = list(r1.get_docs(nlp.vocab))
 
+r1_docs[0].ents
+
 # Predict on rater_1 data
-nlp = spacy.load("da_core_news_sm")
+nlp = spacy.load("da_core_news_sm")  # da-pipeline-0.0.0")
+nlp = spacy.load("da-pipeline-0.0.0")  # da-pipeline-0.0.0")
 r1_texts = [doc.text for doc in r1_docs]
 r1_new_docs = [nlp(text) for text in r1_texts]
 

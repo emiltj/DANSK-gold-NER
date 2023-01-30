@@ -112,7 +112,7 @@ for rater_idx, rater in enumerate(raters):
     )
 
     # Saving single_docs_for_rater
-    outpath_single = f"./data/single/unprocessed/rater_{rater}/data.spacy"
+    outpath_single = f"./data/single/unprocessed/rater_{rater}/train.spacy"
     db_single = DocBin(store_user_data=True)
     print(
         f"Saving docs that have been annotated by not other raters (single) to '{outpath_single}' ..."
@@ -122,7 +122,7 @@ for rater_idx, rater in enumerate(raters):
     db_single.to_disk(outpath_single)
 
     # Saving multiple_docs_for_rater
-    outpath_multi = f"./data/multi/unprocessed/rater_{rater}/data.spacy"
+    outpath_multi = f"./data/multi/unprocessed/rater_{rater}/train.spacy"
     db_multi = DocBin(store_user_data=True)
     print(
         f"Saving docs that have been annotated by other raters as well (multi) to '{outpath_multi}'... \n\n"

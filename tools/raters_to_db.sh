@@ -25,7 +25,7 @@ then
     for i in {1..10}
     do
         echo "Exporting rater_$i data to Prodigy database from ./data/$parent_dir/$dir/* ..."
-        prodigy db-in rater_"$i" ./data/$parent_dir/$dir/rater_$i/data.jsonl
+        prodigy db-in rater_"$i"_"$parent_dir"_"$dir" ./data/$parent_dir/$dir/rater_$i/train.jsonl
     done
 fi
 

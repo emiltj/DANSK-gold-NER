@@ -301,13 +301,13 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
 ```bash
 python src/predict_single/predict_rater_1
 python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
-prodigy db-in
+prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
     - Save to data/single/gold/rater_1
 ```bash
-prodigy review rater_1_single_gold rater_single_unprocessed_1,*MODEL_PREDICTIONS???*, --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review rater_1_single_gold_TEST rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
 
 - **Add this data to a new training dataset**
