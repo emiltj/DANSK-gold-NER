@@ -274,22 +274,22 @@ python -m spacy evaluate models/multi-dupli-and-onto/model-best/ datasets/gold-m
     - https://wandb.ai/emil-tj/gold-multi-train
 
 - **Change meta.json to an appropriate name for pipeline MUST NOT CONTAIN -**
-    - e.g. dansk_dupli_onto_roberta
+    - e.g. multi_dupli_onto_roberta
 
 - **Package best model**
 ```bash
 huggingface-cli login
 # insert token (WRITE) from https://huggingface.co/settings/tokens
 
-# python -m spacy package models/dansk-alone/model-best/ packages/dansk-alone --build wheel
-# python -m spacy package models/dansk-and-onto/model-best/ packages/dansk-and-onto --build wheel
-python -m spacy package models/dansk-dupli-and-onto/model-best/ packages/dansk-dupli-and-onto --build wheel
+# python -m spacy package models/multi-alone/model-best/ packages/multi-alone --build wheel
+# python -m spacy package models/multi-and-onto/model-best/ packages/multi-and-onto --build wheel
+python -m spacy package models/multi-dupli-and-onto/model-best/ packages/multi-dupli-and-onto --build wheel
 ```
 
 - **Push package to huggingfacehub**
     - https://huggingface.co/blog/spacy
 ```bash
-python -m spacy huggingface-hub push dansk-dupli-and-onto-0.0.0-py3-none-any.whl
+python -m spacy huggingface-hub push multi-dupli-and-onto-0.0.0-py3-none-any.whl
 ```
 
 - **Download package of best model to local**
@@ -297,7 +297,7 @@ python -m spacy huggingface-hub push dansk-dupli-and-onto-0.0.0-py3-none-any.whl
 huggingface-cli login
 # insert token (READ) from https://huggingface.co/settings/tokens
 
-python -m spacy huggingface-hub push dansk_dupli_and_onto-0.0.0-py3-none-any.whl
+python -m spacy huggingface-hub push multi_dupli_and_onto-0.0.0-py3-none-any.whl
 ```
 
 - **Load single-unprocessed into database**
