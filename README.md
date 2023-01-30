@@ -289,8 +289,10 @@ python -m spacy package models/multi-dupli-and-onto/model-best/ packages/multi-d
 - **Push package to huggingfacehub**
     - https://huggingface.co/blog/spacy
 ```bash
-python -m spacy huggingface-hub push packages/multi-dupli-and-onto/da_multi_dupli_onto_roberta-0.0.0/dist/da_CPU_test-0.0.0-py3-none-any.whl
+python -m spacy huggingface-hub push packages/multi-dupli-and-onto/da_multi_dupli_onto_roberta-0.0.0/dist/da_multi_dupli_onto_roberta-0.0.0-py3-none-any.whl
 ```
+
+# GOTTEN TO HERE !!!!! ** * 
 
 - **Download package of best model to local**
 ```bash
