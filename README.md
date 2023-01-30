@@ -162,7 +162,7 @@ prodigy db-out gold-multi-ignored-resolved data/multi/gold
 
 - **Write down the gold-multi-ignored-resolved cases**
     - Retrieve the ignored cases as text with annotations (using prodigy print-dataset)
-    - Save retrieved ignored cases to 'edge-cases.txt'
+    - Save retrieved ignored cases to resolved_edge_cases/resolved-edge-cases-multi.txt
 ```bash
 prodigy print-dataset gold-multi-ignored-resolved
 ```
@@ -300,7 +300,8 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
     - Saves predictions as data/single/unprocessed/rater_1/rater_1_predicted.spacy
 ```bash
 python src/predict_single/predict_rater_1
-python src/preprocessing/load_docbin_as_jsonl.py rater_1_preds.spacy blank:da --ner > rater_1_preds.jsonl
+python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
+prodigy db-in
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
