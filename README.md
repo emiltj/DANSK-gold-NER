@@ -257,31 +257,30 @@ wandb login
 cd gold-multi-training
 
 source ucloud_setup/environments/training/bin/activate
-
-python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
-
-python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
-
-python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-onto --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-alone --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-and-onto --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-dupli-and-onto --gpu-id 0
 ```
 
 - **Get metrics of performance**
     - Manually go through these metrics
 ```bash
-python -m spacy evaluate models/dansk-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-alone.json --gpu-id 0
-python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-and-onto.json --gpu-id 0
-python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json --gpu-id 0
+python -m spacy evaluate models/multi-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-alone.json --gpu-id 0
+python -m spacy evaluate models/multi-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-and-onto.json --gpu-id 0
+python -m spacy evaluate models/multi-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-dupli-and-onto.json --gpu-id 0
 ```
 
 - **Assess which model is best, using wandb and metrics of performance from spacy evaluate**
     - https://wandb.ai/emil-tj/gold-multi-train
 
-- **Change meta.json to an appropriate name for pipeline**
-    - e.g. dansk-multi-dupli-and-onto
+- **Change meta.json to an appropriate name for pipeline MUST NOT CONTAIN -**
+    - e.g. dansk_dupli_onto_roberta
 
 - **Package best model**
 ```bash
 huggingface-cli login
+# insert token (WRITE) from https://huggingface.co/settings/tokens
+
 # python -m spacy package models/dansk-alone/model-best/ packages/dansk-alone --build wheel
 # python -m spacy package models/dansk-and-onto/model-best/ packages/dansk-and-onto --build wheel
 python -m spacy package models/dansk-dupli-and-onto/model-best/ packages/dansk-dupli-and-onto --build wheel
@@ -296,6 +295,8 @@ python -m spacy huggingface-hub push dansk-dupli-and-onto-0.0.0-py3-none-any.whl
 - **Download package of best model to local**
 ```bash
 huggingface-cli login
+# insert token (READ) from https://huggingface.co/settings/tokens
+
 python -m spacy huggingface-hub push dansk_dupli_and_onto-0.0.0-py3-none-any.whl
 ```
 
@@ -364,15 +365,15 @@ wandb login
 
 # Manually transfer data/multi/gold/gold-multi-and-gold-rater-1-single.spacy to datasets/
 
-python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-and-gold-rater-1-single.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-rater1-and-onto --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-and-gold-rater-1-single.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-dupli-and-rater1-and-onto --gpu-id 0
 
 # Change meta.json to an appropriate name for pipeline. NOTE USE UNDERSCORES AND NOT - AS THIS MAKES IT CRASH
 
-python -m spacy package models/dansk-dupli-and-rater1-and-onto/model-best/ packages/dansk-dupli-and-rater1-and-onto --build wheel
+python -m spacy package models/multi-dupli-and-rater1-and-onto/model-best/ packages/multi-dupli-and-rater1-and-onto --build wheel
 
 huggingface-cli login
-# insert token from https://huggingface.co/settings/tokens
-python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+# insert token (WRITE) from https://huggingface.co/settings/tokens
+python -m spacy huggingface-hub push multi-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
 ```
 
 - **Predict on the single data for each rater**
@@ -380,7 +381,8 @@ python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-n
 ```bash
 # Move to local and run below
 huggingface-cli login
-python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+# insert token (READ) from https://huggingface.co/settings/tokens
+python -m spacy huggingface-hub push multi-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
 ```
 
 - **Assess agreement between rater and model**
