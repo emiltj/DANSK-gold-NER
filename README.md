@@ -230,13 +230,15 @@ cd DANSK-gold-NER/gold-multi-training
 python3 -m venv ucloud_setup/environments/training
 source ucloud_setup/environments/training/bin/activate
 pip install wheel
-pip install wheels
 pip install numpy==1.23.3
 pip install spacy
-pip install wandb
 pip install spacy-transformers
 pip install torch
 pip install spacy[cuda101]
+pip install huggingface
+pip install huggingface-cli
+pip install spacy-huggingface-hub
+pip install wandb
 wandb login
 # insert API-key from https://wandb.ai/settings
 #pip install -r "requirements_training.txt"
@@ -256,11 +258,11 @@ cd gold-multi-training
 
 source ucloud_setup/environments/training/bin/activate
 
-python -m spacy train configs/config_gpu.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-alone --gpu-id 0
 
-python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-and-onto --gpu-id 0
 
-python -m spacy train configs/config_gpu.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-onto --gpu-id 0
+python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-onto --gpu-id 0
 ```
 
 - **Get metrics of performance**
@@ -271,21 +273,31 @@ python -m spacy evaluate models/dansk-and-onto/model-best/ datasets/gold-multi-d
 python -m spacy evaluate models/dansk-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/dansk-dupli-and-onto.json --gpu-id 0
 ```
 
-- **Package models**
+- **Assess which model is best, using wandb and metrics of performance from spacy evaluate**
+    - https://wandb.ai/emil-tj/gold-multi-train
+
+- **Change meta.json to an appropriate name for pipeline**
+    - e.g. dansk-multi-dupli-and-onto
+
+- **Package best model**
 ```bash
-python -m spacy package models/dansk-alone/model-best/ packages/dansk-alone
-python -m spacy package models/dansk-and-onto/model-best/ packages/dansk-and-onto
-python -m spacy package models/dansk-dupli-and-onto/model-best/ packages/dansk-dupli-and-onto
+huggingface-cli login
+# python -m spacy package models/dansk-alone/model-best/ packages/dansk-alone --build wheel
+# python -m spacy package models/dansk-and-onto/model-best/ packages/dansk-and-onto --build wheel
+python -m spacy package models/dansk-dupli-and-onto/model-best/ packages/dansk-dupli-and-onto --build wheel
 ```
 
-# Have gotten to here(!)!!!!
-
-- **Assess which model is best**
+- **Push package to huggingfacehub**
+    - https://huggingface.co/blog/spacy
+```bash
+python -m spacy huggingface-hub push dansk-dupli-and-onto-0.0.0-py3-none-any.whl
+```
 
 - **Download package of best model to local**
-    - REMEMBER TO CHECK IF CORRUPTED
-    - Manual download
-
+```bash
+huggingface-cli login
+python -m spacy huggingface-hub push dansk_dupli_and_onto-0.0.0-py3-none-any.whl
+```
 
 - **Load single-unprocessed into database**
 ```bash 
@@ -300,27 +312,74 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
     - Saves predictions as data/single/unprocessed/rater_1/rater_1_predicted.spacy
 ```bash
 python src/predict_single/predict_rater_1
-python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
+# fix scrip so that it works: python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
     - Save to data/single/gold/rater_1
 ```bash
-prodigy review rater_1_single_gold_TEST rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+#prodigy review rater_1_single_gold##TEST rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
 
-- **Add this data to a new training dataset**
+- **Merge rater_1_single_gold and gold-multi and write as file**
 ```bash
-prodigy db-in gold-multi-train_???maybe_ontoifitisbest?? gold-multi-training/datasets/onto_and_gold_multi_train.spacy
-prodigy db-merge rater_1_single_gold,gold-multi-train_???maybe_ontoifitisbest? gold-multi-train-and-rater1_resolved
+prodigy db-merge rater_1_single_gold,gold-multi gold-multi-and-gold-rater-1-single
+
+prodigy data-to-spacy data/multi/gold/ --ner gold-multi-and-gold-rater-1-single --lang "da" --eval-split 0
+
+mv data/multi/gold/train.spacy mv data/multi/gold/gold-multi-and-gold-rater-1-single.spacy
+rm -rf labels
+
+prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
 ```
 
 - **Train a new model**
+1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
+2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
+3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/gold-multi-training/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
+4. Add to first recommended
+5. Reload remote
+6. Connect in current window
+7. Run below bash lines
+```bash
+git clone https://github.com/emiltj/DANSK-gold-NER.git
+cd DANSK-gold-NER/gold-multi-training
+bash ucloud_setup/server_dependencies.sh
+cd DANSK-gold-NER/gold-multi-training
+python3 -m venv ucloud_setup/environments/training
+source ucloud_setup/environments/training/bin/activate
+pip install wheel
+pip install numpy==1.23.3
+pip install spacy
+pip install spacy-transformers
+pip install torch
+pip install spacy[cuda101]
+pip install huggingface
+pip install huggingface-cli
+pip install spacy-huggingface-hub
+pip install wandb
+wandb login
 
+# Manually transfer data/multi/gold/gold-multi-and-gold-rater-1-single.spacy to datasets/
+
+python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-and-gold-rater-1-single.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-rater1-and-onto --gpu-id 0
+
+# Change meta.json to an appropriate name for pipeline
+
+python -m spacy package models/dansk-dupli-and-rater1-and-onto/model-best/ packages/dansk-dupli-and-rater1-and-onto --build wheel
+
+huggingface-cli login
+python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+```
 
 - **Predict on the single data for each rater**
     - In a script, locally
+```bash
+# Move to local and run below
+huggingface-cli login
+python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+```
 
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
