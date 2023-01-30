@@ -232,11 +232,11 @@ source ucloud_setup/environments/training/bin/activate
 pip install wheel
 pip install numpy==1.23.3
 pip install spacy
-pip install spacy-transformers
+#pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
+pip install spacy-transformers==1.1.2
 pip install torch
 pip install spacy[cuda101]
 pip install huggingface
-pip install huggingface-cli
 pip install spacy-huggingface-hub
 pip install wandb
 wandb login
