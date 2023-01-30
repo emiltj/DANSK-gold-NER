@@ -366,11 +366,12 @@ wandb login
 
 python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-and-gold-rater-1-single.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/dansk-dupli-and-rater1-and-onto --gpu-id 0
 
-# Change meta.json to an appropriate name for pipeline
+# Change meta.json to an appropriate name for pipeline. NOTE USE UNDERSCORES AND NOT - AS THIS MAKES IT CRASH
 
 python -m spacy package models/dansk-dupli-and-rater1-and-onto/model-best/ packages/dansk-dupli-and-rater1-and-onto --build wheel
 
 huggingface-cli login
+# insert token from https://huggingface.co/settings/tokens
 python -m spacy huggingface-hub push dansk-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
 ```
 
