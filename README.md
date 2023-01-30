@@ -356,10 +356,11 @@ pip install spacy-transformers
 pip install torch
 pip install spacy[cuda101]
 pip install huggingface
-pip install huggingface-cli
+pip install huggingface-hub==0.11.0
 pip install spacy-huggingface-hub
 pip install wandb
 wandb login
+# insert API-key from https://wandb.ai/settings
 
 # Manually transfer data/multi/gold/gold-multi-and-gold-rater-1-single.spacy to datasets/
 
