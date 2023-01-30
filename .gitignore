@@ -5,4 +5,4 @@ gold-multi-training/*/*.spacy
 gold-multi-training/wandb/
 gold-multi-training/output/model-*
 gold-multi-training/models
-gold-multi-training/packages/dan*
+gold-multi-training/packages/dan*/da_pipe*
