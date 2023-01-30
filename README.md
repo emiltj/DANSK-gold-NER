@@ -282,9 +282,10 @@ python -m spacy package models/dansk-dupli-and-onto/model-best/ packages/dansk-d
 
 - **Assess which model is best**
 
+- **Download package of best model to local**
+    - REMEMBER TO CHECK IF CORRUPTED
+    - Manual download
 
-- **Download best model to local**
-    - Into same folder
 
 - **Load single-unprocessed into database**
 ```bash 
@@ -293,11 +294,13 @@ bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed # Convert the unpro
 bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed single data to the prodigy database
 ```
 
-- **Use model to predict the rater with highest agreement with others**
+- **Use model to predict the rater with highest agreement with others and load into db**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
+    - Saves predictions as data/single/unprocessed/rater_1/rater_1_predicted.spacy
 ```bash
-???
+python src/predict_single/predict_rater_1
+python src/preprocessing/load_docbin_as_jsonl.py rater_1_preds.spacy blank:da --ner > rater_1_preds.jsonl
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
