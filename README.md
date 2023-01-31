@@ -15,9 +15,9 @@ python src/preprocessing/split_full_to_single_multi.py
 python src/preprocessing/streamline/streamline_multi.py
 bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
-prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
 python src/preprocessing/split_by_answer.py
-prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE
+prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
 prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 prodigy db-out gold-multi data/multi/gold
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
@@ -140,7 +140,7 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined da
     - LANGUAGE and PRODUCT are not included removed
     - Cases with no conflict are automatically accepted (-A)
 ```bash
-prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
 ```
 
 - **Export the gold-multi-ignored and the gold-multi-accepted cases**
@@ -321,7 +321,7 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
 - **Resolve differences between rater 1 and first_best_model**
     - Save to data/single/gold/rater_1
 ```bash
-prodigy review rater_1_single_gold rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review rater_1_single_gold rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
 ```
 
 - **Merge rater_1_single_gold and gold-multi and write as file**
@@ -403,6 +403,12 @@ python -m spacy huggingface-hub push multi-dupli-and-rater1-and-onto-0.0.0-py3-n
     - Save the gold-single dataset
 
 - **Merge gold-single and gold-multi dataset into gold-dansk**
+
+- **Review any potential extra processing of the tags and/or texts**
+    - Go through the documents in "resolved edge cases"
+```bash
+code resolved_edge_cases/other_thoughts.txt
+```
 
 - **Save gold-dansk**
 
