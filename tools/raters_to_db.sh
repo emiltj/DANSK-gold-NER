@@ -14,7 +14,7 @@ then
     for i in {1..10}
     do
         echo "Exporting rater_$i data to Prodigy database ..."
-        prodigy db-in rater_"$i"_"$parent_dir"_"$dir" ./data/prodigy_exports/prodigy"$i"_db_exports/NER_merged_annotator"$i".jsonl
+        prodigy db-in rater_"$i"_original ./data/prodigy_exports/prodigy"$i"_db_exports/NER_merged_annotator"$i".jsonl
     done
 #rm -r data/prodigy_exports
 rm data/prodigy_exports.zip

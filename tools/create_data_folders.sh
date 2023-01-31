@@ -18,7 +18,7 @@ done
 
 mkdir ./data/single/unprocessed/combined
 mkdir ./data/single/streamlined/combined
-mkdir ./data/single/gold/combined
+#mkdir ./data/single/gold/combined
 mkdir ./data/multi/gold/output/
 mkdir ./data/single/gold/combined/
 

@@ -20,8 +20,8 @@ python src/preprocessing/merge_and_rm_dupli.py
     - Saves to data/full/unprocessed/rater_1/train.spacy
 ```bash
 bash tools/raters_to_db.sh -o 1 # Add DANSK to database
-bash tools/raters_from_db_to_spacy.sh
-bash tools/rm_raters_from_db.sh
+bash tools/raters_from_db_to_spacy.sh -o 1
+bash tools/rm_raters_from_db.sh -o 1
 ```
 
 - **Assess data**
