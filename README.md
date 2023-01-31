@@ -1,56 +1,23 @@
 # DANSK-gold-NER
 
-## Pipeline 'chunked up'
-```bash
-bash tools/create_data_folders.sh
-python src/preprocessing/merge_and_rm_dupli.py
-bash tools/raters_to_db.sh -o 1 # Add DANSK to database
-bash tools/raters_from_db_to_spacy.sh
-bash tools/rm_raters_from_db.sh
-rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 
-rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10
-python src/preprocessing/rater_8_fix.py # Fix rater 8 data
-python src/preprocessing/rm_product_and_language.py # Remove PRODUCT and LANGUAGE tags
-python src/preprocessing/split_full_to_single_multi.py
-python src/preprocessing/streamline/streamline_multi.py
-bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
-bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
-prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
-python src/preprocessing/split_by_answer.py
-prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
-prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
-prodigy db-out gold-multi data/multi/gold
-prodigy data-to-spacy data/multi/gold/ --ner gold-multi --lang "da" --eval-split .2
-```
-Move to UCLOUD
-0. Clone this repo 
-```bash
-Run following code:
-git clone https://github.com/emiltj/DANSK-gold-NER.git
-bash server_dependencies.sh
-bash cuda_dependencies
-```
-
-
 ## Repository pipeline
 - **Create folder structure for the data in the different stages**
 ```bash
 bash tools/create_data_folders.sh
 ```
 
-- **Download data**
-```bash
-Download DANSK, unzip and place unzipped folder in data/
-```
+- **Download DANSK and place in data/**
 
-- **Merge original data and remove duplicates**
+- **Merge NER_annotator1 with NER_interannotator_annotator1 and remove duplicates**
     - Removing duplicates that matches on both 'meta' and on 'text' - only keep the last rated (from timestamp)
     - No removal of duplicates matching only on 'text'
+    - Saves to data/prodigy_exports/prodigy1_db_exports/NER_merged_annotator1.jsonl
 ```bash
 python src/preprocessing/merge_and_rm_dupli.py
 ```
 
-- **Converting data to DocBins/.spacy files**
+- **Convert data to DocBins/.spacy files**
+    - Saves to data/full/unprocessed/rater_1/train.spacy
 ```bash
 bash tools/raters_to_db.sh -o 1 # Add DANSK to database
 bash tools/raters_from_db_to_spacy.sh
@@ -78,24 +45,32 @@ bash tools/rm_raters_from_db.sh
     - Cut away rater 10
     - For rater 8:
         - Exclude all PER annotations if the individual tokens.is_stop = True
-    - Remove all ents with LANGUAGE and PRODUCT
+    - Very low agreement and number of annotations for LANGUAGE and PRODUCT. However, as we will add tags using a different model, this is okay, and we won't remove it.
 ```bash
 rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 
 rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10
 python src/preprocessing/rater_8_fix.py # Fix rater 8 data
-python src/preprocessing/rm_product_and_language.py # Remove PRODUCT and LANGUAGE tags
+#python src/preprocessing/rm_product_and_language.py # Could remove PRODUCT and LANGUAGE tags.
 ```
 
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
     - Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
+    - New files: 
 ```bash
 python src/preprocessing/split_full_to_single_multi.py
+```
+
+- **Have the single unprocessed and full unprocessed not only as .spacy but also as jsonl**
+```bash
+bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
+bash tools/raters_spacy_to_jsonl.sh -p full -d unprocessed
 ```
 
 - **Investigate the distribution of the number of raters for the multi data**
     - Roughly 25% of multi docs have been rated by 2 raters
     - Roughly 25% of multi docs have been rated by 10 raters
     - Roughly 50% of multi docs have been rated by >2 and <10
+    - Useful for knowing how to streamline docs.
 ```bash
 # src/data_assessment/n_raters_for_each_doc.ipynb
 ```
@@ -128,31 +103,42 @@ python src/preprocessing/streamline/streamline_multi.py
 
 - **Adding streamlined data to database**
     - First convert from .spacy to .jsonl
+```bash
 bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
-
-
-- **Manually resolve conflicts in the streamlined data**
-    - Ignoring cases with doubt (and writing them down, to later discuss with team)
-        - E.g. In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
-    - - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
-    - Save as 'gold-multi-all' in db
-    - LANGUAGE and PRODUCT are not included removed
-    - Cases with no conflict are automatically accepted (-A)
-```bash
-prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
 ```
 
-- **Export the gold-multi-ignored and the gold-multi-accepted cases**
+- **Manually resolve conflicts in the streamlined data**
+    - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
+            - In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
+    - "Rejecting" (prodigy cross, button) cases if:
+            - Cases where tokenization is bad, or text is non-sensical to include. E.g. "Aarhus2008" is a single token.
+            
+    - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
+    - Save as 'gold-multi-all' in db
+    - LANGUAGE and PRODUCT are included, although shitty
+    - Cases with no conflict are automatically accepted (-A)
 ```bash
-python src/preprocessing/split_by_answer.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
+prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+```
+
+- **Export the gold-multi-ignored and the gold-multi-accepted and the rejected cases**
+    - Creates new files: 
+        ./data/multi/gold/gold-multi-rejected.jsonl
+        ./data/multi/gold/gold-multi-ignored.jsonl
+        ./data/multi/gold/gold-multi-accepted.jsonl
+        ./data/multi/gold/gold-multi-all.jsonl
+```bash
+python src/preprocessing/split_by_answer_gold_multi.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
 
 - **Review the ignored cases after discussion with team**
-    - See predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5
-    - Discuss with Kenneth/Rebekah/others
+    - In cases of doubt, the Ontonotes dataset is manually scanned for similar cases, and the choice in the gold-standard-ontonotes is used in Danish as well
+    - Sometimes, predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5 are also used.
+    - Sometimes, discussion with team Rebekah resolved cases also.
+    - Any cases where the tokenization is faulty (e.g. Roskilde2020), the 
 ```bash
-prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE
+prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
 - **Dump the gold-multi-ignored-resolved**
@@ -161,8 +147,9 @@ prodigy db-out gold-multi-ignored-resolved data/multi/gold
 ```
 
 - **Write down the gold-multi-ignored-resolved cases**
-    - Retrieve the ignored cases as text with annotations (using prodigy print-dataset)
-    - Save retrieved ignored cases to resolved_edge_cases/resolved-edge-cases-multi.txt
+    - Retrieve the ignored-resolved cases as text with annotations (using prodigy print-dataset)
+    - Save retrieved ignored cases to resolved_edge_cases/gold-multi-ignored-resolved.txt
+    - For EACH EXAMPLE, write notes on rules I used
 ```bash
 prodigy print-dataset gold-multi-ignored-resolved
 ```
@@ -181,6 +168,8 @@ mv gold-multi-training/datasets/train.spacy gold-multi-training/datasets/gold-mu
 prodigy data-to-spacy gold-multi-training/datasets/ --ner gold-multi --lang "da" --eval-split .2
 mv gold-multi-training/datasets/train.spacy gold-multi-training/datasets/gold-multi-train.spacy
 mv gold-multi-training/datasets/dev.spacy gold-multi-training/datasets/gold-multi-dev.spacy
+rm -rf gold-multi-training/datasets/labels
+rm gold-multi-training/datasets/config.cfg
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
@@ -197,9 +186,9 @@ python src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
 ```
 
-- **Remove ents with language and product from Ontonotes (to match DANSK)**
+- **SKIPPED THIS STEP: Remove ents with language and product from Ontonotes (to match DANSK)**
 ```bash
-python src/preprocessing/ontonotes_filter_tags.py
+#python src/preprocessing/ontonotes_filter_tags.py
 ```
 
 - **Merge ontonotes with gold-multi-train**
@@ -229,16 +218,16 @@ bash ucloud_setup/server_dependencies.sh
 cd DANSK-gold-NER/gold-multi-training
 python3 -m venv ucloud_setup/environments/training
 source ucloud_setup/environments/training/bin/activate
-pip install wheel
+pip install wheel==0.38.4 # no version works
 pip install numpy==1.23.3
-pip install spacy
+pip install spacy==3.5.0 # no version works
 #pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
 pip install spacy-transformers==1.1.2
-pip install torch
-pip install spacy[cuda101]
-pip install huggingface
-pip install spacy-huggingface-hub
-pip install wandb
+pip install torch==1.13.1 # no version works
+pip install spacy[cuda101] # no idea about version? but version from 30 Jan 2023 works
+pip install huggingface==0.0.1 # no version works
+pip install spacy-huggingface-hub==0.0.8 #no version works
+pip install wandb==0.13.9 # no version works
 wandb login
 # insert API-key from https://wandb.ai/settings
 #pip install -r "requirements_training.txt"
@@ -257,21 +246,22 @@ wandb login
 cd gold-multi-training
 
 source ucloud_setup/environments/training/bin/activate
-python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-alone --gpu-id 0
-python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-and-onto --gpu-id 0
+#python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-alone --gpu-id 0
+#python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-and-onto --gpu-id 0
 python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gold_multi_train_dupli.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-dupli-and-onto --gpu-id 0
 ```
 
 - **Get metrics of performance**
     - Manually go through these metrics
 ```bash
-python -m spacy evaluate models/multi-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-alone.json --gpu-id 0
-python -m spacy evaluate models/multi-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-and-onto.json --gpu-id 0
+#python -m spacy evaluate models/multi-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-alone.json --gpu-id 0
+#python -m spacy evaluate models/multi-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-and-onto.json --gpu-id 0
 python -m spacy evaluate models/multi-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-dupli-and-onto.json --gpu-id 0
 ```
 
 - **Assess which model is best, using wandb and metrics of performance from spacy evaluate**
     - https://wandb.ai/emil-tj/gold-multi-train
+    - Model chosen was multi-dupli-onto
 
 - **Change meta.json to an appropriate name for pipeline MUST NOT CONTAIN -**
     - e.g. multi_dupli_onto_roberta
@@ -303,37 +293,105 @@ pip install https://huggingface.co/emiltj/da_multi_dupli_onto_roberta/resolve/ma
 
 - **Load single-unprocessed into database**
 ```bash 
-cd DANSK-gold-ner
-bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed # Convert the unprocessed single from .spacy to .jsonl
 bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed single data to the prodigy database
 ```
 
-- **Use model to predict the rater with highest agreement with others and load into db**
+- **Use model to predict the rater with highest agreement with others**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
-    - Saves predictions as data/single/unprocessed/rater_1/rater_1_predicted.spacy
 ```bash
 python src/predict_single/predict_rater_1
+```
+
+- **Convert the predicted ratings into .jsonl to have both formats and add to db**
+```bash
 python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
-    - Save to data/single/gold/rater_1
+        - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion
+        - E.g. 
+            - In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
+            - Tokenization is off 
+    - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
+    - Save as 'gold-multi-all' in db
+    - LANGUAGE and PRODUCT are included, although shitty
+    - Cases with no conflict are automatically accepted (-A)
 ```bash
-prodigy review rater_1_single_gold rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSONORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART -S -A
+prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-- **Merge rater_1_single_gold and gold-multi and write as file**
+- **Export the rater_1_single_gold_ignored and the rater_1_single_gold_accepted cases**
+    - Creates files:
+        ./data/single/gold/rater_1/gold_rejected.jsonl
+        ./data/single/gold/rater_1/gold_accepted.jsonl
+        ./data/single/gold/rater_1/gold_ignored.jsonl
+        ./data/single/gold/rater_1/gold_all.jsonl
+```bash
+python src/preprocessing/split_by_answer_rater_1_single_gold.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
+```
+
+- **Review the ignored cases after discussion with team**
+    - In cases of doubt, the Ontonotes dataset is manually scanned for similar cases, and the choice in the gold-standard-ontonotes is used in Danish as well
+    - Sometimes, predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5 are also used.
+    - Sometimes, discussion with team Rebekah resolved cases also.
+    - Any cases where the tokenization is faulty (e.g. Roskilde2020), the 
+```bash
+prodigy mark rater_1_single_gold_ignored_resolved dataset:rater_1_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+```
+
+- **Dump the rater_1_single_gold_ignored_resolved**
+```bash
+prodigy db-out rater_1_single_gold_ignored_resolved data/single/gold/rater_1
+```
+
+- **Write down the rater_1_single_gold_ignored_resolved cases**
+    - Retrieve the ignored-resolved cases as text with annotations (using prodigy print-dataset)
+    - Save retrieved ignored cases to resolved_edge_cases/rater_1_single_gold_ignored_resolved.txt
+    - For EACH EXAMPLE, write notes on rules I used
+```bash
+prodigy print-dataset rater_1_single_gold_ignored_resolved
+```
+
+- **Merge the rater_1_single_gold_ignored_resolved and the rater_1_single_gold_accepted into rater_1_single_gold**
+```bash
+prodigy db-merge rater_1_single_gold_accepted,rater_1_single_gold_ignored_resolved rater_1_single_gold
+```
+
+- **Merge rater_1_single_gold and gold-multi and write as files (both .json and .spacy)**
 ```bash
 prodigy db-merge rater_1_single_gold,gold-multi gold-multi-and-gold-rater-1-single
-
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi-and-gold-rater-1-single --lang "da" --eval-split 0
-
 mv data/multi/gold/train.spacy mv data/multi/gold/gold-multi-and-gold-rater-1-single.spacy
 rm -rf labels
-
 prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Below steps have not been written out yet
+
+- **Use a model to add extra labels with Product and Language**
+    - Using a multi-lingual model (XLM-ROBERTA-LARGE)
+```bash
+# Consider using https://github.com/KennethEnevoldsen/spacy-wrap
+# Add a new python script that predicts on the texts of the docs of gold-multi-and-gold-rater-1-single.
+# Subset the new docs to only include those that include at least 1 ent
+# Add the subset to the db
+# Use prodigy review on the subset of texts and gold-multi-and-gold-rater-1-single
+# Resolve conflicts
 ```
 
 - **Train a new model**
@@ -351,16 +409,16 @@ bash ucloud_setup/server_dependencies.sh
 cd DANSK-gold-NER/gold-multi-training
 python3 -m venv ucloud_setup/environments/training
 source ucloud_setup/environments/training/bin/activate
-pip install wheel
+pip install wheel==0.38.4 # no version works
 pip install numpy==1.23.3
-pip install spacy
+pip install spacy==3.5.0 # no version works
 #pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
 pip install spacy-transformers==1.1.2
-pip install torch
-pip install spacy[cuda101]
-pip install huggingface
-pip install spacy-huggingface-hub
-pip install wandb
+pip install torch==1.13.1 # no version works
+pip install spacy[cuda101] # no idea about version? but version from 30 Jan 2023 works
+pip install huggingface==0.0.1 # no version works
+pip install spacy-huggingface-hub==0.0.8 #no version works
+pip install wandb==0.13.9 # no version works
 wandb login
 # insert API-key from https://wandb.ai/settings
 
