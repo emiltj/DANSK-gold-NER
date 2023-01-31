@@ -314,7 +314,7 @@ bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed s
     - Saves predictions as data/single/unprocessed/rater_1/rater_1_predicted.spacy
 ```bash
 python src/predict_single/predict_rater_1
-# fix scrip so that it works: python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
+python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
