@@ -321,7 +321,7 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
 - **Resolve differences between rater 1 and first_best_model**
     - Save to data/single/gold/rater_1
 ```bash
-#prodigy review rater_1_single_gold##TEST rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
+prodigy review rater_1_single_gold rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE -S -A
 ```
 
 - **Merge rater_1_single_gold and gold-multi and write as file**
