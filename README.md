@@ -133,8 +133,6 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined da
 prodigy review gold-multi-all rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7_multi_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-# GOTTEN TO HERE(!)
-
 - **Export the gold-multi-ignored and the gold-multi-accepted and the rejected cases**
     - Creates new files: 
         ./data/multi/gold/gold-multi-rejected.jsonl
@@ -147,7 +145,8 @@ python src/preprocessing/split_by_answer_gold_multi.py # Retrieve all ignored an
 
 - **Review the ignored cases after discussion with team**
 ```bash
-prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+# If stream is empty due to gold-multi-ignored being empty, just skip.
 ```
 
 - **Get a count of how many documents needs to be resolved manually, and how many are already identical across all raters**
@@ -155,7 +154,7 @@ prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id re
         - (789 texts)
     - Subtract this number from the total number of texts in the gold-multi-all (see full_len of gold-multi-all in script src/data_assessment/descriptive_stats.py)
         - (886 texts)
-    This gives:
+    - This gives:
         886-789 = 97 texts that were manually gone through
 ```bash
 prodigy review test rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7ulti_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
@@ -165,6 +164,7 @@ prodigy drop test
 - **Dump the gold-multi-ignored-resolved**
 ```bash
 prodigy db-out gold-multi-ignored-resolved data/multi/gold
+# If error, just skip. Just means that gold-multi-ignored was empty, and that gold-multi-ignored-resolved doesn't exist.
 ```
 
 - **Write down the gold-multi-ignored-resolved cases**
@@ -173,11 +173,14 @@ prodigy db-out gold-multi-ignored-resolved data/multi/gold
     - For EACH EXAMPLE, write notes on rules I used
 ```bash
 prodigy print-dataset gold-multi-ignored-resolved
+# If empty or error, just skip
 ```
 
-- **Merge the gold-multi-ignored-resolved and the gold-multi-accepted
+- **Merge the gold-multi-ignored-resolved and the gold-multi-accepted**
 ```bash
 prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
+# If error, just run below code:
+# prodigy db-merge gold-multi-accepted,gold-multi-ignored gold-multi
 ```
 
 - **Export the gold-multi dataset to local machine**
@@ -194,14 +197,15 @@ rm gold-multi-training/datasets/config.cfg
 ```
 
 - **Get access to the Ontonotes NER data in Conll-u format**
-    - See Slack w. Kenneth - got message
     - Await answer from Stephan
     - https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
     - https://huggingface.co/datasets/tner/ontonotes5
 
-
-- **Convert ontonotes to .spacy**
+- **Get access to Ontonotes and convert to .spacy**
     - Using spacy's convert functionality
+    - Saves to :
+        - "data/ontonotes/ontonotes.spacy" and 
+        - "gold-multi-training/datasets/ontonotes.spacy"
 ```bash
 python src/preprocessing/get_ontonotes_spacy_format.py
 #python -m spacy convert <inputfile> --converter conllu
@@ -285,7 +289,7 @@ python -m spacy evaluate models/multi-dupli-and-onto/model-best/ datasets/gold-m
     - Model chosen was multi-dupli-onto
 
 - **Change meta.json to an appropriate name for pipeline MUST NOT CONTAIN -**
-    - e.g. multi_dupli_onto_roberta
+    - e.g. multi_dupli_onto_xlm_roberta_large
 
 - **Package best model**
 ```bash
@@ -300,14 +304,14 @@ python -m spacy package models/multi-dupli-and-onto/model-best/ packages/multi-d
 - **Push package to huggingfacehub**
     - https://huggingface.co/blog/spacy
 ```bash
-python -m spacy huggingface-hub push packages/multi-dupli-and-onto/da_multi_dupli_onto_roberta-0.0.0/dist/da_multi_dupli_onto_roberta-0.0.0-py3-none-any.whl
+python -m spacy huggingface-hub push packages/multi-dupli-and-onto/da_multi_dupli_onto_xlm_roberta_large-0.0.0/dist/da_multi_dupli_onto_xlm_roberta_large-0.0.0-py3-none-any.whl
 ```
 
 - **Download package of best model to local**
 ```bash
 huggingface-cli login
 # insert token (READ) from https://huggingface.co/settings/tokens
-pip install https://huggingface.co/emiltj/da_multi_dupli_onto_roberta/resolve/main/da_multi_dupli_onto_roberta-any-py3-none-any.whl
+pip install https://huggingface.co/emiltj/da_multi_dupli_onto_xlm_roberta_large/resolve/main/da_multi_dupli_onto_xlm_roberta_large-any-py3-none-any.whl
 ```
 
 - **Use model to predict the rater with highest agreement with others**
@@ -336,6 +340,8 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
 ```bash
 prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
+
+# GOTTEN TO HERE(!)
 
 - **Get a count of how many documents needs to be resolved manually, and how many are already identical across model and rater**
     - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated identically)
@@ -495,6 +501,12 @@ code resolved_edge_cases/other_thoughts.txt
     - Ensure that relevant information on Weights and Biases (wandb) is saved so I can use for report. 
     https://docs.wandb.ai/guides/integrations/spacy
     - Packaging to centre-for-humanities-computing
+
+- **Nice to do, not need to do, depends also on performance**
+    - Fix bad labeling in the dataset (Ask Kenneth, he very briefly mentioned below methods)
+    - Do it using one of the following approaches:
+        - Using Spancategorizer
+        - Use the model to predict on parts of the DANSK dataset. And then go through these faulty classifications and see whether the classification is wrong, or whether the labeling is wrong. Go through the wrong labeling and fix it. Iterate this processUse the models' wrong predictions
 
 
 ## Named Entity Recognition (NER) tagging guidelines

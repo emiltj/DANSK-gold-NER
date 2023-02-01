@@ -13,8 +13,7 @@ r1_docs = list(r1.get_docs(nlp.vocab))
 
 # Predict on rater_1 data
 # nlp = spacy.load("da_core_news_sm")  # da-pipeline-0.0.0")
-nlp = spacy.load("da_multi_dupli_onto_roberta")  # da-pipeline-0.0.0")
-
+nlp = spacy.load("da_multi_dupli_onto_xlm_roberta_large")  # da-pipeline-0.0.0")
 r1_texts = [doc.text for doc in r1_docs]
 r1_new_docs = [nlp(text) for text in r1_texts]
 

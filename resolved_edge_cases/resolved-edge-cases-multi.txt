@@ -10,12 +10,26 @@ Eksempler:
     - Danske er en beskrivelse og skal derfor ikke tagges
 - Hvorfor er der egentlig ingen, der taler om at lukke moskeerne for at standse smitte?
     - Moskeerne er her ikke nogle bestemte, named moskeer. Men bare generelt.
+- Foranstående bestemmelser skal imidlertid ikke på nogen måde begrænse statens ret til at håndhæve sådanne love
+    - Her er Staten IKKE et NE.
+    - Følger også mange ontonotes eksempler: "Buildings owned by the state are called gong fang"
 
+Regel: Quantity gælder kun ift. mål, og ikke bare kvantiteter ellers. De skal tagges som Cardinal hvis det ikke er ift. mål.
+Eksempler:
+- "Den træder i kraft, når ti CARDINALratifikationsinstrumenter er blevet deponeret."
+    - Her er ti IKKE en kvantitet, men en cardinal
+    - Stemmer overens med Ontonotes: "more than ten foreign businessmen immediately came to negotiate" -> TAGGET SOM CARDINAL
+- "2 H2 + O2 → 2 H2O"
+    - Her er det CARDINAL, på trods af at det er en kvantitet
+    - "If the pretenders of liberalism who undertook the defense of this couple have one atom of credibility" ONE ER TAGGET SOM CARDINAL
 
 Regel: I tilfælde hvor to entity tags kan passe på dele af samme span, så dominerer det bredeste span
 Eksempler:
 - 'Taler 8' 
     - Might be tagged as a PER, but 8 may be tagged as a cardinal. Here Taler 8 is PERSON, since it is broadest
+- 'Afsnit I i Konventionen til beskyttelse af Menneskerettigheder og grundlæggende FrihedsrettighederLAW, undertegnet i Rom"
+    - "Konventionen til beskyttelse af Menneskerettigheder og grundlæggende Frihedsrettigheder"
+    - Er en LAW, eftersom det er en law, og det er det bredeste.
 
 Regel: Kontekst som ikke er i teksten, bliver ikke metaget i taggingen (Selvom der måske var kontekst fra docs'ne når raters gennemgik dem, vil modellen ikke få dem.)
 Eksempler:
@@ -46,7 +60,46 @@ Eksempler:
 - Loven aftrapper administrationsgodtgørelsen over  2 år  DATE  ,
     - Det er en DATE, 
     - ud fra ontonotes: "but the company expects production to be hampered in the next few months by trafficdisruption"
+- "sagsomkostningsbeløbet skal betales inden 14 dage efter denne højesteretsdoms afsigelse"
+    - HER ER 14 dage EN DATE; UD FRA BELOW EXAMPLES: MEN DÅRLIGT!
+    - UNCLEAR! Doesn't really make sense
+    - Ontonotes: 
+        - "taxes exceeding $3,000 within three days after payroll" Her er THREE DAYS en DATE
+        - "animals can not see for a few days after they 're born, including puppies." Her er A FEW DAYS en DATE
+        - "boy was born two days after deployment." Her er TWO DAYS en DATE
+        - "The resumption comes two days after Israel suspended all contacts following the killing of two Israelis in the West Bank." Her er TWO DAYS en DATE
+        - "Cole has begun its journey home from Yemen, 17 days after a suspected terroristbomb tore a gapping hole in its side." Her er 17 DAYS en DATE
+        - "But only four days after that, Mr. Bush resurrected the veto threat." Her er FOUR DAYS AFTER en DATE
 
+Regel: Når det gælder størrelser med flere dimensioner er det en enkelt quantity, og ikke flere.
+Eksempler:
+    - Serviceklap, 655 x 260 mm QUANTITY
+
+
+Regel: Veje med navne er FACILITY
+Eksempler:
+- I eftermiddag trænede holdet på Scoresbysundvej,
+    - Tagges som FACILITY
+    - Ontonotes:
+        - "P. Smith from a fictitious address in Birmingham, 312, Santos Road." Santos Road er tagget som Facility
+        - "the exhibition that they mounted at a venue in Taipei's Chunghua Road," Er tagget som Facility
+
+Regel: Restauranter er Facility og ikke ORG.
+Eksempler:
+- "Udsmykning af Restaurant 'HimmelhavFACILITY',"
+    - Ontonotes:
+        - ""The location is Peking Supreme Restaurant."" -> Tagget som FACILITY
+
+Regel: "Den dag som" eller "Den måned hvor" Tagges IKKE
+Eksempler:
+- "Forsåvidt angår en signatarmagt, som senere ratificerer protokollen, træder denne i kraft den dag, ratifikationsinstrumentet deponeres."
+    - "den dag, ratifikationsinstrumentet deponeres" er IKKE en DATE
+    - UNCLEAR:
+    - Ontonotes grundlag:  
+        - "The day %uh that I was leaving was the day that she moved in there," -> INGEN TAGS
+        - "You mean the day that Marcia picked you up?" -> INGEN TAGS
+        - "policesay that is where Scott Peterson told them that hedid go fishing the day that Laci Peterson did disappear." -> HER ER THE DAY TAGGET
+    
 
 Regel: Måned for måned, dag for dag, tagges IKKE:
 Eksempler:
@@ -57,6 +110,23 @@ Eksempler:
         - "standard deviation that suggests how much the return will vary year by year." -> "year" tagged, first and second time
         - "The peace forces do n't like uncertainty, I would say even less than the stock market, and things here are getting worse day by day." -> NO tag
 
+
+Regel: Hjemmesider er organisationer, fremfor produkter
+Eksempler:
+-
+    - "51.com would provide a psychological harbor for millions" Her er ORGANIZATION
+
+Regel: Alder???
+Eksempler
+    - UKLART(!!!)
+    - Ontonotes: 
+        - "Baker was 68 years old when she died in Paris" 68 YEARS OLD er DATE
+        - "Now 48 years old, Ms. Volokh" 48 YEARS OLD er DATE
+        - "Mr. Amon, 46 years old, is the company's director" 46 YEARS OLD er DATE
+        - "Now, the 55-year-old car shopper is zeroing in on a full-sized van" 55-YEAR-OLD er DATE
+        - ""One brown two-year-old filly was wheezing from a cold" TWO-YEAR-OLD er DATE
+
+
 Regel: I mere end tredive år, TAGGES,
 Eksempler:
 - Antallet på offentlig forsørgelse er det laveste i mere end tredive år.
@@ -66,11 +136,13 @@ Eksempler:
         - ""Through this, we serve the interests of the country and its government, which this year released the largest budget in more than 30 years," -> TAGGED AS CARDINAL
         - ""About 130 people have been killed in more than three weeks of violence, almost all Palestinians."" Her er hele teksen "more than three weeks", tagged som DATE
 
+
 Regel: Hvis der er en lov med stk. eller paragraph, eller lign. hav da det hele med ind under "LAW"
 Eksempler:
 - I henhold til  medieansvarslovens § 49  LAW  pålægger
     - medieansvarslovens § 49 skal tagges som LAW
     - Eksempel fra Ontonotes: "are they ready to revoke Act No. 80?" -> Her er Act no. 80 en LAW
+
 
 Regel: "Nu" tagges ikke.
 Eksempler:
@@ -78,7 +150,10 @@ Eksempler:
     - Fra ontonotes:
     - "It's time now to look at professional soccer and rugby and how itcan be bad for a player's health."
 
+
 Regel: I tilfælde af det ikke er muligt med Ontonotes eksempler, finder vi i diskussion ud af hvad der giver mest meaning
 Eksempler:
 - "Det Øvrige koges jævnt og med Laag paa 2 à 3 Timer, da gnides Bælgene (ikke Rødderne) gjennem et Dørslag."
     - Her er 2 à 3 timer 2 cardinals.
+- "Første Tillægsprotokol (1952DATE)."
+    - Her er Første Tillægsprotokol ??
