@@ -25,6 +25,13 @@ data_paths = glob.glob("./data/multi/unprocessed/rater*/train.spacy")
 data_paths.sort()
 data_paths.sort(key="./data/multi/unprocessed/rater_10/train.spacy".__eq__)
 
+
+# Filter away rater 2 and 10
+data_paths = [
+    path for path in data_paths if "rater_1" not in path if "rater_3" not in path
+]
+
+
 # Load in data and get rater indices (if not already loaded)
 data = []
 raters = []

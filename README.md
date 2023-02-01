@@ -47,8 +47,8 @@ bash tools/raters_from_db_to_spacy.sh -o 1
         - Exclude all PER annotations if the individual tokens.is_stop = True
     - Very low agreement and number of annotations for LANGUAGE and PRODUCT. However, as we will add tags using a different model, this is okay, and we won't remove it.
 ```bash
-rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 
-rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10
+#rm -r -f data/full/unprocessed/rater_2/* # Remove rater 2 # Just filtered away at the streamline_multi script
+#rm -r -f data/full/unprocessed/rater_10/* # Remove rater 10 # Just filtered away at the streamline_multi script
 python src/preprocessing/rater_8_fix.py # Fix rater 8 data
 #python src/preprocessing/rm_product_and_language.py # Could remove PRODUCT and LANGUAGE tags.
 ```
@@ -133,7 +133,6 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined da
 prodigy review gold-multi-all rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7_multi_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-
 # GOTTEN TO HERE(!)
 
 - **Export the gold-multi-ignored and the gold-multi-accepted and the rejected cases**
@@ -149,6 +148,18 @@ python src/preprocessing/split_by_answer_gold_multi.py # Retrieve all ignored an
 - **Review the ignored cases after discussion with team**
 ```bash
 prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+```
+
+- **Get a count of how many documents needs to be resolved manually, and how many are already identical across all raters**
+    - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated identically
+        - (789 texts)
+    - Subtract this number from the total number of texts in the gold-multi-all (see full_len of gold-multi-all in script src/data_assessment/descriptive_stats.py)
+        - (886 texts)
+    This gives:
+        886-789 = 97 texts that were manually gone through
+```bash
+prodigy review test rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7ulti_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+prodigy drop test
 ```
 
 - **Dump the gold-multi-ignored-resolved**
@@ -292,8 +303,6 @@ python -m spacy package models/multi-dupli-and-onto/model-best/ packages/multi-d
 python -m spacy huggingface-hub push packages/multi-dupli-and-onto/da_multi_dupli_onto_roberta-0.0.0/dist/da_multi_dupli_onto_roberta-0.0.0-py3-none-any.whl
 ```
 
-# GOTTEN TO HERE !!!!! ** * 
-
 - **Download package of best model to local**
 ```bash
 huggingface-cli login
@@ -326,6 +335,18 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
     - Cases with no conflicts are automatically accepted (-A)
 ```bash
 prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+```
+
+- **Get a count of how many documents needs to be resolved manually, and how many are already identical across model and rater**
+    - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated identically)
+        - (? texts)
+    - Subtract this number from the total number of texts in the rater_1_single_unprocessed (see full_len of rater_1_single_unprocessed in script src/data_assessment/descriptive_stats.py)
+        - (? texts)
+    This gives:
+        ?-? = ? texts that were manually gone through
+```bash
+prodigy review test rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+prodigy drop test
 ```
 
 - **Export the rater_1_single_gold_ignored and the rater_1_single_gold_accepted cases**

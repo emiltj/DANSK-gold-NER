@@ -15,4 +15,4 @@ db.add_examples(ignored, ["gold-multi-ignored"])
 
 rejected = [e for e in examples if e["answer"] == "reject"]
 srsly.write_jsonl("./data/multi/gold/gold-multi-rejected.jsonl", rejected)
-db.add_examples(ignored, ["gold-multi-rejected"])
+db.add_examples(rejected, ["gold-multi-rejected"])
