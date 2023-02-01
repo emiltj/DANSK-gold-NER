@@ -122,16 +122,19 @@ bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined da
 - **Manually resolve conflicts in the streamlined data**
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
     - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
+    - When in doubt:
+        - Use rules from resolved_edge_cases/resolved-edge-cases-multi.txt
+            - These rules are self-written but stem from the annotation rules from the Ontonotes dataset
+        - Use consensus from discussion with team Rebekah.
     - Save as 'gold-multi-all' in db
     - LANGUAGE and PRODUCT are included, although shitty
-    - Cases with no conflict are automatically accepted (-A)
+    - Cases with no conflicts are automatically accepted (-A)
 ```bash
 prodigy review gold-multi-all rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7_multi_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
 
 # GOTTEN TO HERE(!)
-
 
 - **Export the gold-multi-ignored and the gold-multi-accepted and the rejected cases**
     - Creates new files: 
@@ -144,10 +147,6 @@ python src/preprocessing/split_by_answer_gold_multi.py # Retrieve all ignored an
 ```
 
 - **Review the ignored cases after discussion with team**
-    - In cases of doubt, the Ontonotes dataset is manually scanned for similar cases, and the choice in the gold-standard-ontonotes is used in Danish as well
-    - Sometimes, predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5 are also used.
-    - Sometimes, discussion with team Rebekah resolved cases also.
-    - Any cases where the tokenization is faulty (e.g. Roskilde2020), the 
 ```bash
 prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
@@ -302,11 +301,6 @@ huggingface-cli login
 pip install https://huggingface.co/emiltj/da_multi_dupli_onto_roberta/resolve/main/da_multi_dupli_onto_roberta-any-py3-none-any.whl
 ```
 
-- **Load single-unprocessed into database**
-```bash 
-bash tools/raters_to_db.sh -p single -d unprocessed -o 0 # Add the unprocessed single data to the prodigy database
-```
-
 - **Use model to predict the rater with highest agreement with others**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
@@ -321,14 +315,15 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
 ```
 
 - **Resolve differences between rater 1 and first_best_model**
-        - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion
-        - E.g. 
-            - In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
-            - Tokenization is off 
-    - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
-    - Save as 'gold-multi-all' in db
+    - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
+    - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
+    - When in doubt:
+        - Use rules from resolved_edge_cases/resolved-edge-cases-multi.txt
+            - These rules are self-written but stem from the annotation rules from the Ontonotes dataset
+        - Use consensus from discussion with team Rebekah.
+    - Save as '' in db
     - LANGUAGE and PRODUCT are included, although shitty
-    - Cases with no conflict are automatically accepted (-A)
+    - Cases with no conflicts are automatically accepted (-A)
 ```bash
 prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
@@ -344,10 +339,6 @@ python src/preprocessing/split_by_answer_rater_1_single_gold.py # Retrieve all i
 ```
 
 - **Review the ignored cases after discussion with team**
-    - In cases of doubt, the Ontonotes dataset is manually scanned for similar cases, and the choice in the gold-standard-ontonotes is used in Danish as well
-    - Sometimes, predictions of a direct translation from the Roberta Large Ontonotes # https://huggingface.co/tner/roberta-large-ontonotes5 are also used.
-    - Sometimes, discussion with team Rebekah resolved cases also.
-    - Any cases where the tokenization is faulty (e.g. Roskilde2020), the 
 ```bash
 prodigy mark rater_1_single_gold_ignored_resolved dataset:rater_1_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
@@ -355,14 +346,6 @@ prodigy mark rater_1_single_gold_ignored_resolved dataset:rater_1_single_gold_ig
 - **Dump the rater_1_single_gold_ignored_resolved**
 ```bash
 prodigy db-out rater_1_single_gold_ignored_resolved data/single/gold/rater_1
-```
-
-- **Write down the rater_1_single_gold_ignored_resolved cases**
-    - Retrieve the ignored-resolved cases as text with annotations (using prodigy print-dataset)
-    - Save retrieved ignored cases to resolved_edge_cases/rater_1_single_gold_ignored_resolved.txt
-    - For EACH EXAMPLE, write notes on rules I used
-```bash
-prodigy print-dataset rater_1_single_gold_ignored_resolved
 ```
 
 - **Merge the rater_1_single_gold_ignored_resolved and the rater_1_single_gold_accepted into rater_1_single_gold**
@@ -396,6 +379,7 @@ prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and
 
 - **Use a model to add extra labels with Product and Language**
     - Using a multi-lingual model (XLM-ROBERTA-LARGE)
+    - Is it possible to increase sensitivity? At the cost of specificity
 ```bash
 # Consider using https://github.com/KennethEnevoldsen/spacy-wrap
 # Add a new python script that predicts on the texts of the docs of gold-multi-and-gold-rater-1-single.
