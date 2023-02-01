@@ -21,7 +21,7 @@ python src/preprocessing/merge_and_rm_dupli.py
 ```bash
 bash tools/raters_to_db.sh -o 1 # Add DANSK to database
 bash tools/raters_from_db_to_spacy.sh -o 1
-bash tools/rm_raters_from_db.sh -o 1
+#bash tools/rm_raters_from_db.sh -o 1
 ```
 
 - **Assess data**
@@ -56,14 +56,25 @@ python src/preprocessing/rater_8_fix.py # Fix rater 8 data
 - **Split data for each rater up into docs that have been rated by multiple raters, and into docs that have only been annotated by a single rater**
     - Split the unprocessed data up into multi and single folders, as they shall be handled in different steps
     - New files: 
+        - data/multi/unprocessed/rater_1/train.spacy
+        - data/single/unprocessed/rater_1/train.spacy
 ```bash
 python src/preprocessing/split_full_to_single_multi.py
 ```
 
-- **Have the single unprocessed and full unprocessed not only as .spacy but also as jsonl**
+- **Have the single unprocessed and full unprocessed and multi_unprocessed not only as .spacy but also as jsonl**
+    - New files:
+        - data/single/unprocessed/rater_1/train.jsonl
 ```bash
 bash tools/raters_spacy_to_jsonl.sh -p single -d unprocessed
 bash tools/raters_spacy_to_jsonl.sh -p full -d unprocessed
+bash tools/raters_spacy_to_jsonl.sh -p multi -d unprocessed
+```
+
+- **Add single_unprocessed and multi_unprocessed to db
+```bash
+bash tools/raters_to_db.sh -p multi -d unprocessed -o 0
+bash tools/raters_to_db.sh -p single -d unprocessed -o 0
 ```
 
 - **Investigate the distribution of the number of raters for the multi data**
@@ -104,23 +115,23 @@ python src/preprocessing/streamline/streamline_multi.py
 - **Adding streamlined data to database**
     - First convert from .spacy to .jsonl
 ```bash
-bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
+bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined -o 0 # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
 ```
 
 - **Manually resolve conflicts in the streamlined data**
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
-            - In cases where a doc with minimal context is provided and multiple tags may be appropriate. E.g. 'Pande' might be tagged as verb or noun.
-    - "Rejecting" (prodigy cross, button) cases if:
-            - Cases where tokenization is bad, or text is non-sensical to include. E.g. "Aarhus2008" is a single token.
-            
-    - In cases where two entities are correct, yet have different spans, the broadest span takes precedence. E.g. 'Taler 8' might be tagged as a PER, but 8 may be tagged as a cardinal
+    - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
     - Save as 'gold-multi-all' in db
     - LANGUAGE and PRODUCT are included, although shitty
     - Cases with no conflict are automatically accepted (-A)
 ```bash
-prodigy review gold-multi-all rater_1,rater_3,rater_4,rater_5,rater_6,rater_7,rater_8,rater_9 --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+prodigy review gold-multi-all rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7_multi_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
+
+
+# GOTTEN TO HERE(!)
+
 
 - **Export the gold-multi-ignored and the gold-multi-accepted and the rejected cases**
     - Creates new files: 

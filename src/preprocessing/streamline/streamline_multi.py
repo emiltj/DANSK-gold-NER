@@ -19,12 +19,11 @@ os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 
 # Load language object
 nlp = spacy.blank("da")
-# nlp = dacy.load('medium')
 
 # List relevant data and sort by rater number
-data_paths = glob.glob("./data/multi/unprocessed/rater*/data.spacy")
+data_paths = glob.glob("./data/multi/unprocessed/rater*/train.spacy")
 data_paths.sort()
-data_paths.sort(key="./data/multi/unprocessed/rater_10/data.spacy".__eq__)
+data_paths.sort(key="./data/multi/unprocessed/rater_10/train.spacy".__eq__)
 
 # Load in data and get rater indices (if not already loaded)
 data = []
@@ -41,6 +40,7 @@ for path in data_paths:
     else:
         docs = list(doc_bin.get_docs(nlp.vocab))
     data.append(docs)
+
 
 # Define raters indexes
 raters_idx = list(range(len(raters)))

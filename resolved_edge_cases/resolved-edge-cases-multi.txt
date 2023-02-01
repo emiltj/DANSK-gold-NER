@@ -1,48 +1,84 @@
-Senere er kun flere ligesindede partier og politikere kommet til
-
-Deres forældre, bedsteforældre er det vel snarere  nu  DATE , de havde alle de muligheder de valgte at forfølge.
-
-Jeg kan benægte, at jeg har taget, eller vil tage, noget kvindeligt radikalt folketingsmedlem på låret.
-
-Der er næppe mange radikale kvinder som går grædende i seng over ikke at blive berørt af dig
-
-Det bliver for tiden vist mest stavet som i citatet af hensyn til sarte sjæle.
-
-Nu har jeg vovet fjerene i flere år og de er slidt af.
-
- 12  CARDINAL 
-
--Den har ikke virket  i tre måneder  DATE .
-
-Danske tekster :
-
- Maat  PERSON 
+Regel: Generelle beskrivelser er ikke et Named Entity
+Eksempler:
+- Vi vælger alle vores egen vej i livet - vi vælger selv om vi vil hænge i s toget FACILITYeller på gymnasiet - uanset herkomst   
+    - Gymnasiet er ikke
+- Senere er kun flere ligesindede partier og politikere kommet til
+    - Partier er ikke
+- Jeg kan benægte, at jeg har taget, eller vil tage, noget kvindeligt radikalt folketingsmedlem på låret.
+    - Radikalt folketingsmedlem er ikke en bestemt PERSON
+- Du danske friske Strand, –
+    - Danske er en beskrivelse og skal derfor ikke tagges
+- Hvorfor er der egentlig ingen, der taler om at lukke moskeerne for at standse smitte?
+    - Moskeerne er her ikke nogle bestemte, named moskeer. Men bare generelt.
 
 
-”, der angår udgiften til nd revision.
+Regel: I tilfælde hvor to entity tags kan passe på dele af samme span, så dominerer det bredeste span
+Eksempler:
+- 'Taler 8' 
+    - Might be tagged as a PER, but 8 may be tagged as a cardinal. Here Taler 8 is PERSON, since it is broadest
 
-Loven aftrapper administrationsgodtgørelsen over  2  CARDINAL  år,
+Regel: Kontekst som ikke er i teksten, bliver ikke metaget i taggingen (Selvom der måske var kontekst fra docs'ne når raters gennemgik dem, vil modellen ikke få dem.)
+Eksempler:
+-  12  CARDINAL 
+    - 12 refererer her i kontekst af andre tekster til dato. Men det er ikke tagget det får.
 
-Efter 2.beh direkte overgang til 3.beh.
+Regel: I tilfælde hvor teksterne er tokenized forkert, så rejecter vi hele teksten.
+Eksempler:
+- Efter 2.beh direkte overgang til 3.beh.
+    - Rejected da 2.beh er forkert tokenized
 
-Måned for måned kommer flere i job.
+Regel: Flag er Work of ART
+Eksempler:
+- Hvor Danebrogen WORK OF ART vaier
+    - Ontonotes: "one they have increased the number of Stars and Stripes they use as a backdrop."
 
-Antallet på offentlig forsørgelse er det laveste i mere end  tredive  CARDINAL  år.
+Regel: I tilfælde hvor TIME eller DATE er uklart, find da eksempler i Ontonotes, og brug det.
+Eksempler:
+- Den har ikke virket  i tre måneder  DATE .
+    - I en tidsperiode er en DATE
+    - DATE: "Five million wereinfected in the last year."    
+- Det bliver for tiden  DATE  vist mest stavet som i citatet af hensyn til sarte sjæle.
+    - For tiden er en DATE, 
+    - jævnfør ontonotes: ''used for support at the time."
+- Nu har jeg vovet fjerene i flere år og de er slidt af.
+    - I flere år er en DATE; 
+    - jævnfør: "Moreover, surely someone has noticed that household refrigerators are closed systems, running for many years without either the CFC gas or the insulation everescaping."
+- Loven aftrapper administrationsgodtgørelsen over  2 år  DATE  ,
+    - Det er en DATE, 
+    - ud fra ontonotes: "but the company expects production to be hampered in the next few months by trafficdisruption"
 
-Du danske friske Strand, –
 
-Du danske friske Strand
+Regel: Måned for måned, dag for dag, tagges IKKE:
+Eksempler:
+- Måned for måned kommer flere i job.
+    - TAGGES IKKE, UD FRA:
+    - UNCLEAR, USING MAJORITY:
+        - "But we 're fighting with a lot more Iraqis day by day /." -> NO tag
+        - "standard deviation that suggests how much the return will vary year by year." -> "year" tagged, first and second time
+        - "The peace forces do n't like uncertainty, I would say even less than the stock market, and things here are getting worse day by day." -> NO tag
 
+Regel: I mere end tredive år, TAGGES,
+Eksempler:
+- Antallet på offentlig forsørgelse er det laveste i mere end tredive år.
+    - TAGGES, "MERE END TREDIVE ÅR", ud fra:
+    - UNCLEAR, using majority:
+        - "a July net deposit inflow of $ 54 million -- the only net inflow in more than a year." -> TAGGED AS DATE
+        - ""Through this, we serve the interests of the country and its government, which this year released the largest budget in more than 30 years," -> TAGGED AS CARDINAL
+        - ""About 130 people have been killed in more than three weeks of violence, almost all Palestinians."" Her er hele teksen "more than three weeks", tagged som DATE
 
-Det Øvrige koges jævnt og med Laag paa  2 à 3 Timer  TIME , da gnides Bælgene (ikke Rødderne) gjennem et Dørslag.
+Regel: Hvis der er en lov med stk. eller paragraph, eller lign. hav da det hele med ind under "LAW"
+Eksempler:
+- I henhold til  medieansvarslovens § 49  LAW  pålægger
+    - medieansvarslovens § 49 skal tagges som LAW
+    - Eksempel fra Ontonotes: "are they ready to revoke Act No. 80?" -> Her er Act no. 80 en LAW
 
-Om Bord paa Herta
+Regel: "Nu" tagges ikke.
+Eksempler:
+- Deres forældre, bedsteforældre er det vel snarere nu, de havde alle de muligheder de valgte at forfølge.
+    - Fra ontonotes:
+    - "It's time now to look at professional soccer and rugby and how itcan be bad for a player's health."
 
-stk
-
-a
-
-
-Noveller
-
-I henhold til  medieansvarslovens § 49  LAW  pålægger
+Regel: I tilfælde af det ikke er muligt med Ontonotes eksempler, finder vi i diskussion ud af hvad der giver mest meaning
+Eksempler:
+- "Det Øvrige koges jævnt og med Laag paa 2 à 3 Timer, da gnides Bælgene (ikke Rødderne) gjennem et Dørslag."
+    - Her er 2 à 3 timer 2 cardinals.
