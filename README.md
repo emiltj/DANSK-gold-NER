@@ -341,15 +341,13 @@ prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/r
 prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-# GOTTEN TO HERE(!)
-
 - **Get a count of how many documents needs to be resolved manually, and how many are already identical across model and rater**
     - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated identically)
-        - (? texts)
+        - (789 texts)
     - Subtract this number from the total number of texts in the rater_1_single_unprocessed (see full_len of rater_1_single_unprocessed in script src/data_assessment/descriptive_stats.py)
-        - (? texts)
+        - (1412 texts)
     This gives:
-        ?-? = ? texts that were manually gone through
+        1412-789 = 623 texts that were manually gone through
 ```bash
 prodigy review test rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 prodigy drop test
@@ -362,8 +360,12 @@ prodigy drop test
         ./data/single/gold/rater_1/gold_ignored.jsonl
         ./data/single/gold/rater_1/gold_all.jsonl
 ```bash
-python src/preprocessing/split_by_answer_rater_1_single_gold.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
+python src/preprocessing/split_by_answer_rater_1_single_gold.py.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
+
+# GOTTEN TO HERE(!)
+
+# REMEMBER TO GO THROUGH THE rater_1_single_gold_all AGAIN, BUT THIS TIME JUST ACCEPTING/REJECTING, SO I CAN GET RID OF THE HORRIBLE EXAMPLES FROM CAMPINGVOGNSSALG. NEEDS TO BE DONE BEFORE PROGRESSING
 
 - **Review the ignored cases after discussion with team**
 ```bash
