@@ -365,7 +365,8 @@ python src/preprocessing/split_by_answer_rater_1_single_gold.py.py # Retrieve al
 
 # GOTTEN TO HERE(!)
 
-# REMEMBER TO GO THROUGH THE rater_1_single_gold_all AGAIN, BUT THIS TIME JUST ACCEPTING/REJECTING, SO I CAN GET RID OF THE HORRIBLE EXAMPLES FROM CAMPINGVOGNSSALG. NEEDS TO BE DONE BEFORE PROGRESSING
+# Before progressing: Split rater_1_single_gold_all into rejected, ignored and accepted. AND THEN GO THROUGH rater_1_single_gold_accepted, using maybe "MARK". Accept all the time, untill I reach the things about camper vans. Then start rejecting bad examples. Then progress
+
 
 - **Review the ignored cases after discussion with team**
 ```bash
