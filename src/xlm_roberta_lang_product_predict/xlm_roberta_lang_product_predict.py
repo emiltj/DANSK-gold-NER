@@ -16,18 +16,25 @@ gold_multi_and_rater_1_single = db.from_disk(
 nlp = spacy.blank("da")
 gold_multi_and_rater_1_single = list(gold_multi_and_rater_1_single.get_docs(nlp.vocab))
 
+
 # specify model from the hub
-config = {"model": {"name": "xlm-roberta-large"}}
+config = {"model": {"name": "flair/ner-english-ontonotes-large"}}
 
 # add it to the pipe
 nlp.add_pipe("token_classification_transformer", config=config)
 
+# See pipeline
+nlp.pipeline
 
-nlp = spacy.blank("da")
+l = "Denne model fungerer okay på forskellige sprog. Jeg håber den virker på dansk, engelsk og måske fransk. Og så håber jeg at den fungerer på produkter. F.eks. skal den kunne tagge macbook eller Steelseries Keyboard 3000."
+k = nlp(l)
 
+for i in k.ents:
+    i.label_
 
 # Get as texts
 texts = [doc.text for doc in gold_multi_and_rater_1_single]
+
 
 # Use xlm-roberta NER pipeline to tag text
 docs = [nlp(text) for text in texts]

@@ -115,17 +115,14 @@ python src/preprocessing/streamline/streamline_multi.py
 - **Adding streamlined data to database**
     - First convert from .spacy to .jsonl
 ```bash
-bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined -o 0 # Convert the streamlined multi from .spacy to .jsonl
+bash tools/raters_spacy_to_jsonl.sh -p multi -d streamlined # Convert the streamlined multi from .spacy to .jsonl
 bash tools/raters_to_db.sh -p multi -d streamlined -o 0 # Add the streamlined data to the prodigy database
 ```
 
 - **Manually resolve conflicts in the streamlined data**
+    - Resolvement is based off of the data/ontonotes/ontonotes-named-entity-guidelines-v14.pdf guidelines.
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
     - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
-    - When in doubt:
-        - Use rules from resolved_edge_cases/resolved-edge-cases-multi.txt
-            - These rules are self-written but stem from the annotation rules from the Ontonotes dataset
-        - Use consensus from discussion with team Rebekah.
     - Save as 'gold-multi-all' in db
     - LANGUAGE and PRODUCT are included, although shitty
     - Cases with no conflicts are automatically accepted (-A)
@@ -157,7 +154,7 @@ prodigy mark gold-multi-ignored-resolved dataset:gold-multi-ignored --view-id re
     - This gives:
         886-789 = 97 texts that were manually gone through
 ```bash
-prodigy review test rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7ulti_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+prodigy review test rater_1_multi_streamlined,rater_3_multi_streamlined,rater_4_multi_streamlined,rater_5_multi_streamlined,rater_6_multi_streamlined,rater_7_multi_streamlined,rater_8_multi_streamlined,rater_9_multi_streamlined --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 prodigy drop test
 ```
 
@@ -196,10 +193,17 @@ rm -rf gold-multi-training/datasets/labels
 rm gold-multi-training/datasets/config.cfg
 ```
 
+
+# GOTTEN TO HERE(!)
+
+
 - **Get access to the Ontonotes NER data in Conll-u format**
     - Await answer from Stephan
-    - https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
-    - https://huggingface.co/datasets/tner/ontonotes5
+    - This link has the Ontonotes in conll format, but needs to be converted to .spacy 
+        - https://data.mendeley.com/datasets/zmycy7t9h9/2
+    - These two links are previous things I tried out. The first is dehydrated, and the second does not include all texts (and does not hold information on whitespacing for the sentences)
+        - https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
+        - https://huggingface.co/datasets/tner/ontonotes5
 
 - **Get access to Ontonotes and convert to .spacy**
     - Using spacy's convert functionality
@@ -362,11 +366,6 @@ prodigy drop test
 ```bash
 python src/preprocessing/split_by_answer_rater_1_single_gold.py.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
-
-# GOTTEN TO HERE(!)
-
-# Before progressing: Split rater_1_single_gold_all into rejected, ignored and accepted. AND THEN GO THROUGH rater_1_single_gold_accepted, using maybe "MARK". Accept all the time, untill I reach the things about camper vans. Then start rejecting bad examples. Then progress
-
 
 - **Review the ignored cases after discussion with team**
 ```bash

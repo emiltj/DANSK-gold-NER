@@ -1,0 +1,7 @@
+Regel: LAWS skriver man hele den lang ind som ENT
+Hvorfor?: Ontonotes guidelines: "[Article II of the Constitution] "
+Eksempler: "sigelse og forrentes efter [rentelovens § 8]"
+
+Regel: Taler 8 eller anonymiserede tekster skal ikke tagges
+Hvorfor?: Ontonotes guidelines: Der står hvilke ord der skal tagges. I denne liste står disse ting IKKE(!)
+Eksempler: "Taler 9", "'a' skal betale 900kr i erstatning"

@@ -1,8 +1,8 @@
 from prodigy.components.db import connect
 
 db = connect()
-all_dataset_names = db.datasets
 
+all_dataset_names = db.datasets
 all_dataset_names
 
 dataset_descriptive_stats = []

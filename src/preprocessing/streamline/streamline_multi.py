@@ -25,12 +25,14 @@ data_paths = glob.glob("./data/multi/unprocessed/rater*/train.spacy")
 data_paths.sort()
 data_paths.sort(key="./data/multi/unprocessed/rater_10/train.spacy".__eq__)
 
+data_paths
 
 # Filter away rater 2 and 10
 data_paths = [
-    path for path in data_paths if "rater_1" not in path if "rater_3" not in path
+    path for path in data_paths if "rater_2" not in path if "rater_10" not in path
 ]
 
+data_paths
 
 # Load in data and get rater indices (if not already loaded)
 data = []
@@ -78,7 +80,7 @@ n_raters = len(raters_idx)
 streamlined_data = []
 
 for rater_idx in raters_idx:
-    print(f"streamlining rater: {rater_idx} ...")
+    print(f"streamlining rater: {raters_lookup[rater_idx]} ...")
     streamlined_rater_docs = []
     rater_docs = copy.deepcopy(data[rater_idx])
     for doc in unique_docs:
