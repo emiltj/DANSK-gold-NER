@@ -180,6 +180,19 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 # prodigy db-merge gold-multi-accepted,gold-multi-ignored gold-multi
 ```
 
+# Gotten to here
+# Write a script (gold-multi-training/datasets/xlm_roberta_lang_product_predict.py) to try and predict with a transformer model.
+# Create a new virtual environment with a spacy version that may use either: 
+# "xlm-roberta-large-finetuned-conll03-english"
+# or 
+# "tner/roberta-large-ontonotes5"
+- **Add Language and Product predictions on the gold-multi dataset**
+    - Use tner/roberta-large-ontonotes5
+```bash
+gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
+```
+
+
 - **Export the gold-multi dataset to local machine**
     - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
 ```bash
@@ -194,9 +207,6 @@ rm gold-multi-training/datasets/config.cfg
 ```
 
 
-# GOTTEN TO HERE(!)
-
-
 - **Get access to the Ontonotes NER data in Conll-u format**
     - Await answer from Stephan
     - This link has the Ontonotes in conll format, but needs to be converted to .spacy 
@@ -205,13 +215,14 @@ rm gold-multi-training/datasets/config.cfg
         - https://github.com/ontonotes/conll-formatted-ontonotes-5.0/blob/master/conll-formatted-ontonotes-5.0/data/test/data/english/annotations/bn/cnn/01/cnn_0109.gold_skel
         - https://huggingface.co/datasets/tner/ontonotes5
 
-- **Get access to Ontonotes and convert to .spacy**
+- **Get access to Ontonotes and convert to .spacy and .jsonl**
     - Using spacy's convert functionality
     - Saves to :
         - "data/ontonotes/ontonotes.spacy" and 
         - "gold-multi-training/datasets/ontonotes.spacy"
 ```bash
 python src/preprocessing/get_ontonotes_spacy_format.py
+python ./src/preprocessing/load_docbin_as_jsonl.py data/ontonotes/ontonotes.spacy blank:da --ner > data/ontonotes/ontonotes.jsonl
 #python -m spacy convert <inputfile> --converter conllu
 ```
 
@@ -222,6 +233,9 @@ python src/preprocessing/get_ontonotes_spacy_format.py
 
 - **Merge ontonotes with gold-multi-train**
     - Both duplicating the gold-multi-train to have same weight, but also just with the original size
+    - Creates:
+        - onto_and_gold_multi_train.spacy
+        - onto_and_gold_multi_train_dupli.spacy
 ```bash
 python gold-multi-training/datasets/merge_multi_ontonotes.py
 ```

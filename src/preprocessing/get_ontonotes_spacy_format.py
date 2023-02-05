@@ -2,9 +2,9 @@ from datasets import load_dataset
 from spacy.tokens import Doc, DocBin
 import spacy
 import json, os
-from spacemodel import SpaceModel, load_texts
 
-os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/src/preprocessing")
+from spacemodel import SpaceModel, load_texts
 
 # Define spacemodel
 spacemodel = SpaceModel(lang="en")
@@ -13,12 +13,19 @@ spacemodel = SpaceModel(lang="en")
 texts = load_texts("da", 50_000)  #
 spacemodel.fit(texts[:10000])
 
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
 # Loading labels lookup
 with open("./src/preprocessing/ontonotes_labels.json") as json_file:
     labels_lookup = json.load(json_file)
 
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/src/preprocessing")
+
+labels_lookup
+
 # Loading dataset
 ontonotes_dicts = load_dataset("tner/ontonotes5", split="train")
+
+ontonotes_dicts[0]
 
 # Convert ontonotes dicts to list of spacy docs
 ontonotes_docs = []
@@ -33,9 +40,20 @@ for ontonotes_dict in ontonotes_dicts:
     )
     ontonotes_docs.append(doc)
 
+# for i, doc in enumerate(ontonotes_docs):
+#     for ent in doc.ents:
+#         if ent.label_ in ["LANGUAGE", "PRODUCT"]:
+#             print(i)
+#             print(ent)
+
+# ontonotes_docs[58044].ents[0].label
+
+os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
+
 # Dump ontonotes in docbin format
 if not os.path.exists("data/ontonotes"):
     os.mkdir("data/ontonotes")
+
 
 db = DocBin()
 for doc in ontonotes_docs:

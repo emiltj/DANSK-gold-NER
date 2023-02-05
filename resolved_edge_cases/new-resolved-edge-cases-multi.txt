@@ -3,5 +3,6 @@ Hvorfor?: Ontonotes guidelines: "[Article II of the Constitution] "
 Eksempler: "sigelse og forrentes efter [rentelovens § 8]"
 
 Regel: Taler 8 eller anonymiserede tekster skal ikke tagges
-Hvorfor?: Ontonotes guidelines: Der står hvilke ord der skal tagges. I denne liste står disse ting IKKE(!)
+Hvorfor?: Ontonotes guidelines: Der står hvilke ord der skal tagges. I denne liste står disse ting IKKE(!). Speaker 8 kunne lige så godt have været omtale af en løber (eksempelvis løber 7 overhaler løber 5) og her ville man ikke tagge. Derudover går anonymisering går jo lige præcis ud på at FJERNE named entities.
 Eksempler: "Taler 9", "'a' skal betale 900kr i erstatning"
+
