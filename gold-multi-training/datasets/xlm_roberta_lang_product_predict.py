@@ -4,18 +4,6 @@ import spacy_wrap
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 from transformers import pipeline
 
-# Load tokenizer and model for NER token classification
-# tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large-finetuned-conll03-english")
-# model = AutoModelForTokenClassification.from_pretrained(
-#     "xlm-roberta-large-finetuned-conll03-english"
-# )
-# classifier = pipeline("ner", model=model, tokenizer=tokenizer)
-
-spacy.load("xlm-roberta-large-finetuned-conll03-english")
-
-# Change dir
-os.chdir("/Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER")
-
 # Load gold-multi data as doc objects
 db = DocBin()
 gold_multi_train = db.from_disk("gold-multi-training/datasets/gold-multi-train.spacy")
@@ -25,14 +13,24 @@ gold_multi_train = list(gold_multi_train.get_docs(nlp.vocab))
 # Get it as texts for the new classifier to classify on
 texts = [doc.text for doc in gold_multi_train]
 
-# specify model from the hub
-# config = {"model": {"name": "tner/roberta-large-ontonotes5"}}
-
-# add it to the pipe
-# nlp.add_pipe("token_classification_transformer", config=config)
-
-# Use xlm-roberta NER pipeline to tag text
+######### Solution 1 (spacy normal):
+# nlp = spacy.load("xlm-roberta-large-finetuned-conll03-english")
 # docs = [nlp(text) for text in texts]
+
+######### Solution 2 (spacy wrap):
+# nlp = spacy.load("da")
+# config = {"model": {"name": "tner/roberta-large-ontonotes5"}}
+# nlp.add_pipe("token_classification_transformer", config=config)
+# docs = [nlp(text) for text in texts]
+
+######### Solution 3 (transformers, wrong output)
+# Load tokenizer and model for NER token classification
+# tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large-finetuned-conll03-english")
+# model = AutoModelForTokenClassification.from_pretrained(
+#     "xlm-roberta-large-finetuned-conll03-english"
+# )
+# classifier = pipeline("ner", model=model, tokenizer=tokenizer)
+
 
 # Filter away docs that do not have a tag for either product or language
 
