@@ -243,8 +243,6 @@ python gold-multi-training/datasets/merge_multi_ontonotes.py
     - Change to KennethEnevoldsen/dfm-bert-large-v1-2048bsz-1Msteps, which has highest performance, given scandeval.
     - Also maybe try: the google rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
 
-# Gotten to here
-
 - **Setup Ucloud for GPU-use**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
 2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
@@ -295,6 +293,7 @@ python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gol
 
 - **Get metrics of performance**
     - Manually go through these metrics
+    - Save to local under "metrics"
 ```bash
 #python -m spacy evaluate models/multi-alone/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-alone.json --gpu-id 0
 #python -m spacy evaluate models/multi-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-and-onto.json --gpu-id 0
@@ -334,19 +333,27 @@ pip install https://huggingface.co/emiltj/da_multi_dupli_onto_xlm_roberta_large/
 - **Use model to predict the rater with highest agreement with others**
     - Based on the script: src/data_assessment/interrater_reliability/interrater_reliability.ipynb
     - I chose rater 1
+    - Creates "data/single/unprocessed/rater_1/rater_1_preds.spacy"
 ```bash
 python src/predict_single/predict_rater_1
 ```
 
 - **Convert the predicted ratings into .jsonl to have both formats and add to db**
+    - Creates data/single/unprocessed/rater_1/rater_1_preds.jsonl
+    - and 
+    - data/single/unprocessed/rater_1/train.jsonl
 ```bash
 python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1/rater_1_preds.spacy blank:da --ner > data/single/unprocessed/rater_1/rater_1_preds.jsonl
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
+# Gotten to here
+
 - **Resolve differences between rater 1 and first_best_model**
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
     - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
+    - Using data/ontonotes/ontonotes-named-entity-guidelines-v14.pdf for guidelines
+    
     - When in doubt:
         - Use rules from resolved_edge_cases/resolved-edge-cases-multi.txt
             - These rules are self-written but stem from the annotation rules from the Ontonotes dataset
@@ -419,7 +426,8 @@ prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and
 
 # Below steps have not been written out yet
 
-- **Add Language and Product predictions on the gold-multi dataset**
+
+- **Add Language and Product predictions on the gold-multi-rater-1 dataset**
     - Use tner/roberta-large-ontonotes5
     - Add the subset to the db
     - Use prodigy review on the subset of texts and gold-multi-and-gold-rater-1-single
@@ -428,6 +436,10 @@ prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and
 gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
 # NOTE SEE WHETHER IT ADDS ANY PREDICTIONS (AND WRITE DOWN HOW MANY HERE ABOVE). IF TOO FEW, THEN COPY THIS STEP TO WHEN THE ENTIRE DANSK DATASET IS DONE(!)
 ```
+
+- **Add Language and Product predictions on the gold-multi-rater-1 dataset using zshot**
+???
+
 
 - **Train a new model**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
