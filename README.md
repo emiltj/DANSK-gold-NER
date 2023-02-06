@@ -180,18 +180,15 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 # prodigy db-merge gold-multi-accepted,gold-multi-ignored gold-multi
 ```
 
-# Gotten to here
-# Write a script (gold-multi-training/datasets/xlm_roberta_lang_product_predict.py) to try and predict with a transformer model.
-# Create a new virtual environment with a spacy version that may use either: 
-# "xlm-roberta-large-finetuned-conll03-english"
-# or 
-# "tner/roberta-large-ontonotes5"
+
+
 - **Add Language and Product predictions on the gold-multi dataset**
     - Use tner/roberta-large-ontonotes5
+    - Only adds one, wrong label. So I'll skip it
+    - Perhaps to make sense to mention in methods, regardless
 ```bash
-gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
+#gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
 ```
-
 
 - **Export the gold-multi dataset to local machine**
     - Both as .jsonl and split into training and validation data as .spacy. Includes default config for the spaCy training.
@@ -245,6 +242,8 @@ python gold-multi-training/datasets/merge_multi_ontonotes.py
     - Add wandb for later tracking
     - Change to KennethEnevoldsen/dfm-bert-large-v1-2048bsz-1Msteps, which has highest performance, given scandeval.
     - Also maybe try: the google rembert model: https://huggingface.co/google/rembert (alternatively ROBERTA Base transformer model: en_core_web_trf)
+
+# Gotten to here
 
 - **Setup Ucloud for GPU-use**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
@@ -420,16 +419,14 @@ prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and
 
 # Below steps have not been written out yet
 
-- **Use a model to add extra labels with Product and Language**
-    - Using a multi-lingual model (XLM-ROBERTA-LARGE)
-    - Is it possible to increase sensitivity? At the cost of specificity
+- **Add Language and Product predictions on the gold-multi dataset**
+    - Use tner/roberta-large-ontonotes5
+    - Add the subset to the db
+    - Use prodigy review on the subset of texts and gold-multi-and-gold-rater-1-single
+    - Resolve conflicts
 ```bash
-# Consider using https://github.com/KennethEnevoldsen/spacy-wrap
-# Add a new python script that predicts on the texts of the docs of gold-multi-and-gold-rater-1-single.
-# Subset the new docs to only include those that include at least 1 ent
-# Add the subset to the db
-# Use prodigy review on the subset of texts and gold-multi-and-gold-rater-1-single
-# Resolve conflicts
+gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
+# NOTE SEE WHETHER IT ADDS ANY PREDICTIONS (AND WRITE DOWN HOW MANY HERE ABOVE). IF TOO FEW, THEN COPY THIS STEP TO WHEN THE ENTIRE DANSK DATASET IS DONE(!)
 ```
 
 - **Train a new model**
