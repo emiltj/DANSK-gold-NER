@@ -1,8 +1,80 @@
-Regel: LAWS skriver man hele den lang ind som ENT
+Regel: LAWS skriver man det længste man kan komme i tanker om ind som ENT, inklusiv årstal. Også hvis der tales om underlovgivning under en større lov
 Hvorfor?: Ontonotes guidelines: "[Article II of the Constitution] "
 Eksempler: "sigelse og forrentes efter [rentelovens § 8]"
+            "Første Tillægsprotokol (1952)."
+            "Første Tillægsprotokol til Konvention til beskyttelse af Menneskerettigheder og grundlæggende Frihedsrettigheder"
+            "Artikel 1 - Beskyttelse af ejendom."
 
 Regel: Taler 8 eller anonymiserede tekster skal ikke tagges
 Hvorfor?: Ontonotes guidelines: Der står hvilke ord der skal tagges. I denne liste står disse ting IKKE(!). Speaker 8 kunne lige så godt have været omtale af en løber (eksempelvis løber 7 overhaler løber 5) og her ville man ikke tagge. Derudover går anonymisering går jo lige præcis ud på at FJERNE named entities.
-Eksempler: "Taler 9", "'a' skal betale 900kr i erstatning"
+Eksempler: "Taler 8", "'a' skal betale 900kr i erstatning"
 
+Regel: Words such as "Konventionen" is not a Named Entity, despite it being with capital letters 
+Hvorfor?: It is a Coreference problem -> It is not a named entity, but rather refers to a named entity. I would never even consider it if it had not been capitalized.
+Eksempler: "De medlemmer af Europarådet, som har undertegnet Konventionen."
+
+Regel: Words such as "Vestjysk" are not NORPS unless the area they refer to is a GPE, rather than a LOCATION.
+Hvorfor?: Ontonotes states that NORP's have to refer to GPE's.
+Eksempler: "For et år siden var et vestjysk parcel- eller rækkehus til salg i 117 dage, før det blev solgt." -> Since Vestjylland is a location, rather than a GPE it should not be tagged.
+
+Regel: "Nu" is neither tagged as TIME nor as DATE
+Hvorfor?: Ontonotes doesn't give examples of it, and there are no examples of now being tagged in the ontonotes
+Eksempler: "Vi substituerer nu s og t med løsningsformlens udtryk"
+
+Regel: ???? NOT CLEAR. Organization+Product should only be tagged as ORG + PRODUCT if product is precise.
+Why not clear?: In Danish, words are combined into single tokens. E.g. "Hellalygter" in "stoplygte ABSbag med Hellalygter Dobbeltvinduer, tonede, med rollos Glatpladealuminium Heki 2"
+Hvorfor?:
+    - Ontonotes states: References that include manufacturer and product should be marked as two separate named entities, ORG + PRODUCT: [Apple] [iPod]
+    - Ontonotes examples where PRODUCT is not tagged
+        -   "..and today.. I paid $ 68 bucks to fillup my 89 Ford Van." -> Ford tagged
+        -   "People who believe in school player, gay marriage, people who drive Ford Explorers and who drive Volvo station wagons." -> Ford [ORG], Explorers [PRODUCT], Volvo [ORG]
+Eksempler:
+    - "Når du vælger en Crawford-port får du en fast pris du kan stole på - helt uden overraskelse" Her er CRAWFORD tagged, men ikke resten(!)
+    - BUT in above example - Crawford-port is a single token(!)
+
+
+Regel: ??? NOT CLEAR Websites are / are NOT tagged as organization nor as product
+Hvorfor?: 
+    - Found ontonotes examples where they weren't, e.g. 
+        - "For more business and consumer news, click on to cnnfn.com." 
+        - "Become a member of at westin.com."
+        - ""At the end of 2005 51.com will be listed among the 500 top companies"
+    - Found ontonotes examples where they were, e.g. 
+        - "Priceline.com, the first American company to sellairline tickets directly over the Internet" -> ORG 
+        - "Guy Kawasaki, founder of Garage.com, the largest US company" -> ORG, 
+        - "51.com would provide a psychological harbor for millions of young Chinese females." -> ORG
+Eksempler: 
+    - "Cookie og privatlivspolitik Digitalt Berlingske.dk Business.dk"
+    - "Business.dk"
+    - "Avisen - weekend Komplet Berlingske.dk"
+    - "Web samlerabat Berlingske.dk + Business.dk"
+    - "Du kan i mellemtiden læse alle artikler på B.dk og Business.dk eller læse e-avisen gratis her"
+
+Regel: If insufficient context to determine tag, exclude (red cross)
+Eksempler:
+    - "Volstrup" -> Could be GPE or PER
+
+Regel: Improper tokenization: Exclude (red cross)
+Eksempler:
+    - "Børnehaven2008, "
+
+Regel: If a mention includes a time, day, month, and year, all these should be included in a single tag:  
+"the morning of Sept 11, 2001" = TIME
+Hvorfor?: 
+    - Står i ontonotes-named-entity-guidelines
+
+Regel: S-tog er facility.
+Hvorfor?: Facility indebærer infrastruktur
+Eksempel:
+    - "På vejen hjem med S-toget som i dagens varme anledning, har tændt for radiatorerne"
+
+Regel: When a product includes a year, it is not part of the PRODUCT tag
+Hvorfor?: It is not stated int he NER guidelines
+Eksempel:
+    - "Teknisk afdeling har valgt en Bürstner Club 465 TN årgang 1995 til månedens brugtvognstest"
+
+Regel: "Den" tages med i date. Ligesom på Engelsk i Ontonotes eksempler (selvom det ikke er stated)
+Hvorfor?: Det gør det i Ontonotes eksempler:
+    - ""Unlike the 20th century" The er her med i DATE
+Eksempel:
+    - "bringe nekrologen allerede den 22. december 1995."

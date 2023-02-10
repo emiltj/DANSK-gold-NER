@@ -347,7 +347,7 @@ python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
-# Gotten to here
+# Gotten to here(!)
 
 - **Resolve differences between rater 1 and first_best_model**
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
@@ -366,12 +366,12 @@ prodigy review rater_1_single_gold_all rater_1_single_unprocessed,rater_1_single
 ```
 
 - **Get a count of how many documents needs to be resolved manually, and how many are already identical across model and rater**
-    - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated identically)
-        - (789 texts)
+    - Take the number "TOTAL" - this is the total number of texts that we have already been through (i.e. texts that were annotated already as they were identical between machine and human rater)
+        - (759 texts)
     - Subtract this number from the total number of texts in the rater_1_single_unprocessed (see full_len of rater_1_single_unprocessed in script src/data_assessment/descriptive_stats.py)
         - (1412 texts)
     This gives:
-        1412-789 = 623 texts that were manually gone through
+        1412-759 = 653 texts that were manually gone through
 ```bash
 prodigy review test rater_1_single_unprocessed,rater_1_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 prodigy drop test
