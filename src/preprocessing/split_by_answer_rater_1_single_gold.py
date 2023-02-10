@@ -15,4 +15,4 @@ db.add_examples(ignored, ["rater_1_single_gold_ignored"])
 
 rejected = [e for e in examples if e["answer"] == "reject"]
 srsly.write_jsonl("./data/single/gold/rater_1/gold_rejected.jsonl", rejected)
-db.add_examples(ignored, ["rater_1_single_gold_rejected"])
+db.add_examples(rejected, ["rater_1_single_gold_rejected"])

@@ -33,7 +33,7 @@ Eksempler:
     - BUT in above example - Crawford-port is a single token(!)
 
 
-Regel: ??? NOT CLEAR Websites are / are NOT tagged as organization nor as product
+Regel: ??? NOT CLEAR. Websites are tagged as Organization or Product if they are explicitly mentioned as such.
 Hvorfor?: 
     - Found ontonotes examples where they weren't, e.g. 
         - "For more business and consumer news, click on to cnnfn.com." 
@@ -78,3 +78,4 @@ Hvorfor?: Det gør det i Ontonotes eksempler:
     - ""Unlike the 20th century" The er her med i DATE
 Eksempel:
     - "bringe nekrologen allerede den 22. december 1995."
+

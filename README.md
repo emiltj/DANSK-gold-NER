@@ -347,8 +347,6 @@ python src/preprocessing/load_docbin_as_jsonl.py data/single/unprocessed/rater_1
 prodigy db-in rater_1_single_unprocessed_preds data/single/unprocessed/rater_1/rater_1_preds.jsonl
 ```
 
-# Gotten to here(!)
-
 - **Resolve differences between rater 1 and first_best_model**
     - "Ignoring" (prodigy no parking sign, button) cases with doubt, for later discussion.
     - "Rejecting" (prodigy cross, button) cases where the text is wrong. E.g. wrongly tokenized. (Aarhus2005)
@@ -384,14 +382,13 @@ prodigy drop test
         ./data/single/gold/rater_1/gold_ignored.jsonl
         ./data/single/gold/rater_1/gold_all.jsonl
 ```bash
-python src/preprocessing/split_by_answer_rater_1_single_gold.py.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
+python src/preprocessing/split_by_answer_rater_1_single_gold.py # Retrieve all ignored and accepted instances. Loads them into db datasets 'gold-multi-accepted' and 'gold-multi-ignored' (also saves these as .jsonl to data/multi/gold)
 ```
 
 - **Review the ignored cases after discussion with team**
 ```bash
-prodigy mark rater_1_single_gold_ignored_resolved dataset:rater_1_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+prodigy mark rater_1_single_gold_ignored_resolved dataset:rater_1_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 ```
-
 - **Dump the rater_1_single_gold_ignored_resolved**
 ```bash
 prodigy db-out rater_1_single_gold_ignored_resolved data/single/gold/rater_1
@@ -402,7 +399,19 @@ prodigy db-out rater_1_single_gold_ignored_resolved data/single/gold/rater_1
 prodigy db-merge rater_1_single_gold_accepted,rater_1_single_gold_ignored_resolved rater_1_single_gold
 ```
 
+- **Get count of rejected vs accepted for rater_1_single_gold**
+    - Out of 1412 text, 12 were ignored for later review and 42 were rejected
+    - Out of the ignored 12, 1 was rejected and 11 were accepted
+    - Total:
+        - Accepted: 1370
+        - Rejected: 43
+```bash
+python src/data_assessment/descriptive_stats.py
+```
+
 - **Merge rater_1_single_gold and gold-multi and write as files (both .json and .spacy)**
+    - Creates in db, and as jsonl and as spacy
+        - gold-multi-and-gold-rater-1-single
 ```bash
 prodigy db-merge rater_1_single_gold,gold-multi gold-multi-and-gold-rater-1-single
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi-and-gold-rater-1-single --lang "da" --eval-split 0
@@ -411,21 +420,9 @@ rm -rf labels
 prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
+# Gotten to here
 
 # Below steps have not been written out yet
-
 
 - **Add Language and Product predictions on the gold-multi-rater-1 dataset**
     - Use tner/roberta-large-ontonotes5
