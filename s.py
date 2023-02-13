@@ -58,3 +58,64 @@ doc = nlp(
     "This is some other text that also contains information on hydrochloric acid (CH3COOH), which is sometimes used in medicine"
 )
 displacy.serve(doc, style="ent")
+
+working = {
+    "text": "Forhold til konventionen",
+    "tokens": [
+        {"text": "Forhold", "start": 0, "end": 7, "id": 0, "ws": true},
+        {"text": "til", "start": 8, "end": 11, "id": 1, "ws": true},
+        {"text": "konventionen", "start": 12, "end": 24, "id": 2, "ws": false},
+    ],
+    "_is_binary": false,
+    "_view_id": "ner_manual",
+    "answer": "accept",
+    "_timestamp": 1635322276,
+    "spans": [],
+}
+
+working = {
+    "text": "Forhold til konventionen",
+    "tokens": [
+        {"text": "Forhold", "start": 0, "end": 7, "id": 0, "ws": true},
+        {"text": "til", "start": 8, "end": 11, "id": 1, "ws": true},
+        {"text": "konventionen", "start": 12, "end": 24, "id": 2, "ws": false},
+    ],
+    "_is_binary": false,
+    "_view_id": "ner_manual",
+    "answer": "accept",
+    "_timestamp": 1635322276,
+    "spans": [],
+}
+
+
+full = {
+    "text": "Tredjegradsligninger",
+    "tokens": [
+        {"text": "Tredjegradsligninger", "start": 0, "end": 20, "id": 0, "ws": false}
+    ],
+    "_is_binary": false,
+    "_view_id": "ner_manual",
+    "answer": "accept",
+    "_timestamp": 1635322276,
+    "spans": [],
+}
+
+
+preds = {
+    "text": "TEC 565",
+    "tokens": [
+        {"text": "TEC", "start": 0, "end": 3, "id": 0, "ws": true},
+        {"text": "565", "start": 4, "end": 7, "id": 1, "ws": false},
+    ],
+    "_is_binary": false,
+    "_view_id": "ner_manual",
+    "answer": "accept",
+    "_timestamp": 1635322276,
+    "spans": [
+        {"start": 4, "end": 7, "label": "PRODUCT", "token_start": 1, "token_end": 1}
+    ],
+}
+
+
+l.keys()
+l["versions"][0]

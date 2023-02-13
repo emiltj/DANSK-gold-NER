@@ -180,14 +180,12 @@ prodigy db-merge gold-multi-accepted,gold-multi-ignored-resolved gold-multi
 # prodigy db-merge gold-multi-accepted,gold-multi-ignored gold-multi
 ```
 
-
-
 - **Add Language and Product predictions on the gold-multi dataset**
     - Use tner/roberta-large-ontonotes5
     - Only adds one, wrong label. So I'll skip it
     - Perhaps to make sense to mention in methods, regardless
 ```bash
-#gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
+#gold-multi-training/datasets/lang_product_predict_gold_multi.py
 ```
 
 - **Export the gold-multi dataset to local machine**
@@ -203,9 +201,7 @@ rm -rf gold-multi-training/datasets/labels
 rm gold-multi-training/datasets/config.cfg
 ```
 
-
 - **Get access to the Ontonotes NER data in Conll-u format**
-    - Await answer from Stephan
     - This link has the Ontonotes in conll format, but needs to be converted to .spacy 
         - https://data.mendeley.com/datasets/zmycy7t9h9/2
     - These two links are previous things I tried out. The first is dehydrated, and the second does not include all texts (and does not hold information on whitespacing for the sentences)
@@ -410,33 +406,91 @@ python src/data_assessment/descriptive_stats.py
 ```
 
 - **Merge rater_1_single_gold and gold-multi and write as files (both .json and .spacy)**
-    - Creates in db, and as jsonl and as spacy
+    - Creates in folders:
+        - data/multi/gold/gold-multi-and-gold-rater-1-single-ner-manual.jsonl
+        - data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
+        - data/multi/gold/gold-multi-and-gold-rater-1-single.spacy
+
+    - Creates in db
         - gold-multi-and-gold-rater-1-single
+        - gold-multi-and-gold-rater-1-single-ner-manual
 ```bash
 prodigy db-merge rater_1_single_gold,gold-multi gold-multi-and-gold-rater-1-single
 prodigy data-to-spacy data/multi/gold/ --ner gold-multi-and-gold-rater-1-single --lang "da" --eval-split 0
-mv data/multi/gold/train.spacy mv data/multi/gold/gold-multi-and-gold-rater-1-single.spacy
-rm -rf labels
-prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
+mv data/multi/gold/train.spacy data/multi/gold/gold-multi-and-gold-rater-1-single.spacy
+rm -rf data/multi/gold/labels
+rm -rf data/multi/gold/output
+rm data/multi/gold/config.cfg
+prodigy db-out gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single
+mv data/multi/gold/gold-multi-and-gold-rater-1-single/gold-multi-and-gold-rater-1-single.jsonl data/multi/gold/gold-multi-and-gold-rater-1-single.jsonl
+python src/preprocessing/review_to_ner_manual_for_jsonl.py gold-multi-and-gold-rater-1-single data/multi/gold/gold-multi-and-gold-rater-1-single-ner-manual.jsonl
+prodigy db-in gold-multi-and-gold-rater-1-single-ner-manual data/multi/gold/gold-multi-and-gold-rater-1-single-ner-manual.jsonl
+rm -r data/multi/gold/gold-multi-and-gold-rater-1-single
+```
+
+- **Make Language and Product predictions on the gold-multi-rater-1**
+    - Predict on entire dataset using tner/roberta-large-ontonotes5
+    - Keep only docs with ents LANGUAGE and/or PRODUCT
+    - Remove all other ents apart from LANGUAGE and product
+    - Saves in folders:
+                - data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod.spacy
+        - data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod.jsonl
+        - data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual.jsonl
+    - Saves in db:
+        - gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual
+```bash
+python gold-multi-training/datasets/lang_product_predict_gold_multi_rater_1.py
+python src/preprocessing/load_docbin_as_jsonl.py data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod.spacy blank:da --ner > data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod.jsonl # add as jsonl also
+prodigy db-in gold-multi-and-gold-rater-1-single-preds-lang-prod data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod.jsonl
+python src/preprocessing/review_to_ner_manual_for_jsonl.py gold-multi-and-gold-rater-1-single-preds-lang-prod data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual.jsonl
+prodigy db-in gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual.jsonl
 ```
 
 # Gotten to here
 
-# Below steps have not been written out yet
-
-- **Add Language and Product predictions on the gold-multi-rater-1 dataset**
-    - Use tner/roberta-large-ontonotes5
-    - Add the subset to the db
-    - Use prodigy review on the subset of texts and gold-multi-and-gold-rater-1-single
-    - Resolve conflicts
+- **Review the gold-multi-and-gold-rater-1-single and the gold-multi-and-gold-rater-1-single-preds-lang-prod**
+    - 38 were added
+    - 35 were gone through manually using the review (the remaining 6 were identical to the gold-multi-and-golder-rater-1-single texts)
 ```bash
-gold-multi-training/datasets/xlm_roberta_lang_product_predict.py
-# NOTE SEE WHETHER IT ADDS ANY PREDICTIONS (AND WRITE DOWN HOW MANY HERE ABOVE). IF TOO FEW, THEN COPY THIS STEP TO WHEN THE ENTIRE DANSK DATASET IS DONE(!)
+prodigy review test gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual,gold-multi-and-gold-rater-1-single-ner-manual --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+prodigy review gold-multi-and-gold-rater-1-single-extra-lang-prod gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual,gold-multi-and-gold-rater-1-single-ner-manual --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-- **Add Language and Product predictions on the gold-multi-rater-1 dataset using zshot**
-???
+- **The reviewed is saved as a file**
+    - Creates:
+        - gold-multi-and-gold-rater-1-single-extra-lang-prod.jsonl
+        - gold-multi-and-gold-rater-1-single-extra-lang-prod.spacy
+```bash
+prodigy db-out gold-multi-and-gold-rater-1-single-extra-lang-prod data/multi/gold/gold-multi-and-gold-rater-1-single-extra-lang-prod
+mv data/multi/gold/gold-multi-and-gold-rater-1-single-extra-lang-prod/gold-multi-and-gold-rater-1-single-extra-lang-prod.jsonl data/multi/gold/gold-multi-and-gold-rater-1-single-extra-lang-prod.jsonl
+rm -r data/multi/gold/gold-multi-and-gold-rater-1-single-extra-lang-prod
+prodigy data-to-spacy data/multi/gold/ --ner gold-multi-and-gold-rater-1-single-extra-lang-prod --lang "da" --eval-split 0
+mv data/multi/gold/train.spacy data/multi/gold/gold-multi-and-gold-rater-1-single-extra-lang-prod.spacy  
+rm -rf data/multi/gold/labels
+rm -rf data/multi/gold/config.cfg
+```
 
+- **Overwrite the texts from gold-multi-and-gold-rater-1-single-extra-lang-prod.jsonl into gold-multi-and-gold-rater-1-single-ner-manual**
+    - Creates in folder:
+        - data/multi/gold/gold-multi-rater-1.jsonl
+        - data/multi/gold/gold-multi-rater-1.spacy
+        - gold-multi-training/datasets/gold-multi-rater-1/gold-multi-rater-1-full.spacy
+    - Creates in db:
+        - gold-multi-rater-1
+```bash
+python src/preprocessing/overwrite.py
+prodigy db-in gold-multi-rater-1 data/multi/gold/gold-multi-rater-1.jsonl
+prodigy data-to-spacy data/multi/gold/ --ner gold-multi-rater-1 --lang "da" --eval-split 0
+cp data/multi/gold/train.spacy gold-multi-training/datasets/gold-multi-rater-1/gold-multi-rater-1-full.spacy
+mv data/multi/gold/train.spacy data/multi/gold/gold-multi-rater-1.spacy
+rm -rf data/multi/gold/labels
+rm -rf data/multi/gold/config.cfg
+prodigy data-to-spacy gold-multi-training/datasets/gold-multi-rater-1/ --ner gold-multi-rater-1 --lang "da" --eval-split 0.2
+mv gold-multi-training/datasets/gold-multi-rater-1/train.spacy gold-multi-training/datasets/gold-multi-rater-1/gold-multi-rater-1-train.spacy
+mv gold-multi-training/datasets/gold-multi-rater-1/dev.spacy gold-multi-training/datasets/gold-multi-rater-1/gold-multi-rater-1-dev.spacy
+rm -rf gold-multi-training/datasets/gold-multi-rater-1/labels
+rm -rf gold-multi-training/datasets/gold-multi-rater-1/config.cfg
+```
 
 - **Train a new model**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
@@ -514,7 +568,14 @@ code resolved_edge_cases/other_thoughts.txt
 
 - **Save gold-dansk**
 
-- **Save all gold-multi-ignored and gold-single-ignored (both prior to resolvement), in order for me to be able to get back to it at a later stage for the methods section.**
+- **Nice to do, not need to do, depends also on performance**
+    - Predict on bad labels (e.g. product and language) on existing dataset, and subsequently use prodigy review on only these docs
+        - Make predictions using Zero shot predictions (Zshot - https://spacy.io/universe/project/Zshot)
+        - Make predictions using and English trained model (same style as: gold-multi-training/datasets/lang_product_predict_gold_multi_rater_1.py)
+    - Fix bad labeling in the dataset (Ask Kenneth, he very briefly mentioned below methods)
+    - Do it using one of the following approaches:
+        - Using Spancategorizer
+        - Use the model to predict on parts of the DANSK dataset. And then go through these faulty classifications and see whether the classification is wrong, or whether the labeling is wrong. Go through the wrong labeling and fix it. Iterate this processUse the models' wrong predictions
 
 - **Gain access to Huggingface account centre-for-humanities-computing**
 
@@ -523,12 +584,6 @@ code resolved_edge_cases/other_thoughts.txt
     - Ensure that relevant information on Weights and Biases (wandb) is saved so I can use for report. 
     https://docs.wandb.ai/guides/integrations/spacy
     - Packaging to centre-for-humanities-computing
-
-- **Nice to do, not need to do, depends also on performance**
-    - Fix bad labeling in the dataset (Ask Kenneth, he very briefly mentioned below methods)
-    - Do it using one of the following approaches:
-        - Using Spancategorizer
-        - Use the model to predict on parts of the DANSK dataset. And then go through these faulty classifications and see whether the classification is wrong, or whether the labeling is wrong. Go through the wrong labeling and fix it. Iterate this processUse the models' wrong predictions
 
 
 ## Named Entity Recognition (NER) tagging guidelines
