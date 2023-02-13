@@ -446,8 +446,6 @@ python src/preprocessing/review_to_ner_manual_for_jsonl.py gold-multi-and-gold-r
 prodigy db-in gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual data/multi/gold/gold-multi-and-gold-rater-1-single-preds-lang-prod-ner-manual.jsonl
 ```
 
-# Gotten to here
-
 - **Review the gold-multi-and-gold-rater-1-single and the gold-multi-and-gold-rater-1-single-preds-lang-prod**
     - 38 were added
     - 35 were gone through manually using the review (the remaining 6 were identical to the gold-multi-and-golder-rater-1-single texts)
@@ -492,6 +490,14 @@ rm -rf gold-multi-training/datasets/gold-multi-rater-1/labels
 rm -rf gold-multi-training/datasets/gold-multi-rater-1/config.cfg
 ```
 
+- **Create a few different training sets, merging from ontonotes**
+    - Creates:
+        - onto_and_gold_multi_rater_1_train_dupli.spacy
+        - onto_and_gold_multi_rater_1_train.spacy
+```bash
+python datasets/gold-multi-rater-1/merge_multi_ontonotes.py
+```
+
 - **Train a new model**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
 2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
@@ -520,17 +526,31 @@ pip install wandb==0.13.9 # no version works
 wandb login
 # insert API-key from https://wandb.ai/settings
 
-# Manually transfer data/multi/gold/gold-multi-and-gold-rater-1-single.spacy to datasets/
+# Manually transfer gold-multi-training/datasets to gold-multi-training/datasets
+gold-multi-training/datasets/gold-multi-rater-1/onto_and_gold_multi_rater_1_train_dupli.spacy
+python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-rater-1/onto_and_gold_multi_rater_1_train_dupli.spacy --paths.dev datasets/gold-multi-rater-1/gold-multi-rater-1-dev.spacy --output models/multi-dupli-rater_1-onto --gpu-id 0
 
-python -m spacy train configs/config_trf.cfg --paths.train datasets/gold-multi-and-gold-rater-1-single.spacy --paths.dev datasets/gold-multi-dev.spacy --output models/multi-dupli-and-rater1-and-onto --gpu-id 0
+python -m spacy evaluate models/multi-dupli-rater_1-onto/model-best/ datasets/gold-multi-rater-1/gold-multi-rater-1-dev.spacy --output metrics/multi-dupli-rater_1-onto.json --gpu-id 0
+
+# Manually transfer gold-multi-training/metrics/multi-dupli-rater_1-onto.json to local
 
 # Change meta.json to an appropriate name for pipeline. NOTE USE UNDERSCORES AND NOT - AS THIS MAKES IT CRASH
+# e.g. multi_dupli_rater_1_onto
 
-python -m spacy package models/multi-dupli-and-rater1-and-onto/model-best/ packages/multi-dupli-and-rater1-and-onto --build wheel
+python -m spacy package models/multi-dupli-rater_1-onto/model-best/ packages/multi-dupli-rater-1-onto --build wheel
 
 huggingface-cli login
 # insert token (WRITE) from https://huggingface.co/settings/tokens
-python -m spacy huggingface-hub push multi-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+python -m spacy huggingface-hub push packages/multi-dupli-rater-1-onto/da_multi_dupli_rater_1_onto-0.0.0/dist/da_multi_dupli_rater_1_onto-0.0.0-py3-none-any.whl
+
+# This creates https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto
+```
+
+# GOTTEN TO HERE
+
+- **Pip install new model on local**
+```bash
+pip install https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto/resolve/main/da_multi_dupli_rater_1_onto-any-py3-none-any.whl
 ```
 
 - **Predict on the single data for each rater**
