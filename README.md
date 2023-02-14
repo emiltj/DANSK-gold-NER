@@ -546,8 +546,6 @@ python -m spacy huggingface-hub push packages/multi-dupli-rater-1-onto/da_multi_
 # This creates https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto
 ```
 
-# GOTTEN TO HERE
-
 - **Pip install new model on local**
 ```bash
 pip install https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto/resolve/main/da_multi_dupli_rater_1_onto-any-py3-none-any.whl
@@ -556,14 +554,17 @@ pip install https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto/resolve/ma
 - **Predict on the single data for each rater**
     - In a script, locally
 ```bash
-# Move to local and run below
-huggingface-cli login
-# insert token (READ) from https://huggingface.co/settings/tokens
-python -m spacy huggingface-hub push multi-dupli-and-rater1-and-onto-0.0.0-py3-none-any.whl
+python src/predict_single/predict_rater_2-9.py
 ```
+
+# GOTTEN TO HERE
 
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
+```bash
+# Go through script manually:
+# src/data_assessment/model_and_raters_agreement.ipynb
+```
 
 - **Potentially. Make appropriate changes on gold-standard-multi data based on the assessment between rater and model**
 
