@@ -649,37 +649,49 @@ prodigy mark rater_9_single_gold_ignored_resolved dataset:rater_9_single_gold_ig
 
 - **Dump the rater_{r}_single_gold_ignored**
 ```bash
-prodigy db-out rater_{r}_single_gold_ignored data/single/gold
+prodigy db-out rater_{r}_single_gold_ignored data/single/gold/rater_{r}
 ```
 
 - **Merge the rater_{r}_single_gold_ignored and the rater_{r}_single_gold_accepted**
+    - Creates in db:
+        - rater_{r}_single_gold
 ```bash
-prodigy db-merge rater-{r}-single-gold-accepted,rater-{r}-single-gold-ignored rater_1_single_gold
+prodigy db-merge rater-{r}-single-gold-accepted,rater-{r}-single-gold-ignored rater_{r}_single_gold
 ```
+
+- **Merge all single_gold dataset in db**
+    - Creates in db:
+        - gold-single
+```bash
+prodigy db-merge rater_3_single_gold,rater_4_single_gold,rater_5_single_gold,rater_6_single_gold,rater_7_single_gold,rater_8_single_gold,rater_9_single_gold gold-single
+```
+
+- **Merge all gold datasets in db**
+    - Creates in db:
+        - gold-full
+```bash
+prodigy db-merge gold-single,gold-multi-and-gold-rater-1-single, gold-full
+```
+
+- **Calculate how many tags there are of each type**
+```bash
+?????
+```
+
+- **
+
+
+
 
 
 # Only written out steps to here(!)
 # Below add:
-- Merge all single gold for all raters
 - Add language and product predictions to single gold combined
 - Resolve them
 - Add overwrite the resolved in single gold combined (see above way of doing it)
 - Merge the single-gold-combined with extra lang+prod into the gold-multi-and-gold-rater-1-single
 - Have it be NER manual instead (see above way of doing it)
 ...???
-
-
-
-
-
-- **Add Language and Product predictions on the gold-multi dataset**
-    - Use tner/roberta-large-ontonotes5
-    - Only adds one, wrong label. So I'll skip it
-    - Perhaps to make sense to mention in methods, regardless
-```bash
-#gold-multi-training/datasets/lang_product_predict_gold_multi.py
-```
-
 
 - **Merge all gold datasets in db**
 
