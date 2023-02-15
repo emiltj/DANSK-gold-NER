@@ -557,14 +557,138 @@ pip install https://huggingface.co/emiltj/da_multi_dupli_rater_1_onto/resolve/ma
 python src/predict_single/predict_rater_2-9.py
 ```
 
-# GOTTEN TO HERE
-
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
+    For rater 3:
+    Cases where ents are same between predicted and model: 638
+    Cases where ents are NOT same between preds and model: 888
+    For rater 4:
+    Cases where ents are same between predicted and model: 1114
+    Cases where ents are NOT same between preds and model: 1363
+    For rater 5:
+    Cases where ents are same between predicted and model: 422
+    Cases where ents are NOT same between preds and model: 980
+    For rater 6:
+    Cases where ents are same between predicted and model: 1046
+    Cases where ents are NOT same between preds and model: 1213
+    For rater 7:
+    Cases where ents are same between predicted and model: 754
+    Cases where ents are NOT same between preds and model: 1148
+    For rater 8:
+    Cases where ents are same between predicted and model: 622
+    Cases where ents are NOT same between preds and model: 1076
+    For rater 9:
+    Cases where ents are same between predicted and model: 906
+    Cases where ents are NOT same between preds and model: 1203
+    Total cases where ents are same 5502
+    Total cases where ents are NOT same 7871
 ```bash
 # Go through script manually:
 # src/data_assessment/model_and_raters_agreement.ipynb
 ```
+
+- **Add predictions to db**
+    - Creates in db:
+        - rater_"$i"_single_unprocessed_preds
+    - Creates in folders:
+        - ./data/single/unprocessed/rater_$i/rater_"$i"_preds.jsonl
+```bash
+# tools/raters_preds_to_db.sh
+prodigy drop rater_2_single_unprocessed_preds
+prodigy drop rater_10_single_unprocessed_preds
+```
+
+# GOTTEN TO HERE
+
+- **Review raters 3, 4, 5, 6, 7, 8, 9**
+```bash
+prodigy review rater_3_single_gold_all rater_3_single_unprocessed,rater_3_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_4_single_gold_all rater_4_single_unprocessed,rater_4_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_5_single_gold_all rater_5_single_unprocessed,rater_5_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_6_single_gold_all rater_6_single_unprocessed,rater_6_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_7_single_gold_all rater_7_single_unprocessed,rater_7_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_8_single_gold_all rater_8_single_unprocessed,rater_8_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+
+prodigy review rater_9_single_gold_all rater_9_single_unprocessed,rater_9_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+```
+
+- **Split the rater_3_single_gold_all**
+    - Creates new files:
+        - ./data/single/gold/rater_{r}/rater_{r}_single_gold_all.jsonl
+    - Creates new in db:
+        - rater_{r}_single_gold_accepted
+        - rater_{r}_single_gold_ignored
+        - rater_{r}_single_gold_rejected
+```bash
+python src/preprocessing/split_by_answer_rater_3_9_single_gold.py
+```
+
+- **Resolve ignored cases in rater_{r}_single_gold_ignored**
+    - Creates in db:
+        - rater_{r}_single_gold_ignored_resolved
+```bash
+prodigy mark rater_3_single_gold_ignored_resolved dataset:rater_3_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_4_single_gold_ignored_resolved dataset:rater_4_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_5_single_gold_ignored_resolved dataset:rater_5_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_6_single_gold_ignored_resolved dataset:rater_6_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_7_single_gold_ignored_resolved dataset:rater_7_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_8_single_gold_ignored_resolved dataset:rater_8_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+
+prodigy mark rater_9_single_gold_ignored_resolved dataset:rater_9_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+```
+
+- **Dump the rater_{r}_single_gold_ignored**
+```bash
+prodigy db-out rater_{r}_single_gold_ignored data/single/gold
+```
+
+- **Merge the rater_{r}_single_gold_ignored and the rater_{r}_single_gold_accepted**
+```bash
+prodigy db-merge rater-{r}-single-gold-accepted,rater-{r}-single-gold-ignored rater_1_single_gold
+```
+
+
+# Only written out steps to here(!)
+# Below add:
+- Merge all single gold for all raters
+- Add language and product predictions to single gold combined
+- Resolve them
+- Add overwrite the resolved in single gold combined (see above way of doing it)
+- Merge the single-gold-combined with extra lang+prod into the gold-multi-and-gold-rater-1-single
+- Have it be NER manual instead (see above way of doing it)
+...???
+
+
+
+
+
+- **Add Language and Product predictions on the gold-multi dataset**
+    - Use tner/roberta-large-ontonotes5
+    - Only adds one, wrong label. So I'll skip it
+    - Perhaps to make sense to mention in methods, regardless
+```bash
+#gold-multi-training/datasets/lang_product_predict_gold_multi.py
+```
+
+
+- **Merge all gold datasets in db**
+
+
+
+
+
+
+
 
 - **Potentially. Make appropriate changes on gold-standard-multi data based on the assessment between rater and model**
 
