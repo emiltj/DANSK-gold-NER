@@ -13,6 +13,11 @@ Regel: Words such as "Konventionen" is not a Named Entity, despite it being with
 Hvorfor?: It is a Coreference problem -> It is not a named entity, but rather refers to a named entity. I would never even consider it if it had not been capitalized.
 Eksempler: "De medlemmer af Europarådet, som har undertegnet Konventionen."
 
+Regel: Fiktive steder er også LOCATION og GPE'S, men himlen og helvede er koncepter i stedet
+Hvorfor?: PERSON der er fiktive er også med
+Eksempler:
+    - Midgård
+
 Regel: Words such as "Vestjysk" are not NORPS unless the area they refer to is a GPE, rather than a LOCATION.
 Hvorfor?: Ontonotes states that NORP's have to refer to GPE's.
 Eksempler: "For et år siden var et vestjysk parcel- eller rækkehus til salg i 117 dage, før det blev solgt." -> Since Vestjylland is a location, rather than a GPE it should not be tagged.
@@ -21,7 +26,12 @@ Regel: "Nu" is neither tagged as TIME nor as DATE
 Hvorfor?: Ontonotes doesn't give examples of it, and there are no examples of now being tagged in the ontonotes
 Eksempler: "Vi substituerer nu s og t med løsningsformlens udtryk"
 
-Regel: ???? NOT CLEAR. Organization+Product should only be tagged as ORG + PRODUCT if product is precise.
+Regel: Gud / Vor Herre er ikke en PERSON
+Hvorfor?: Ontonotes indkludere ikke Gud som PER
+Eksempler:
+    - "Vor Herre Himmerig"
+
+Regel: ???? NOT CLEAR. Organization+Product should only be tagged as ORG + PRODUCT if product is precise. Else
 Why not clear?: In Danish, words are combined into single tokens. E.g. "Hellalygter" in "stoplygte ABSbag med Hellalygter Dobbeltvinduer, tonede, med rollos Glatpladealuminium Heki 2"
 Hvorfor?:
     - Ontonotes states: References that include manufacturer and product should be marked as two separate named entities, ORG + PRODUCT: [Apple] [iPod]
@@ -31,7 +41,6 @@ Hvorfor?:
 Eksempler:
     - "Når du vælger en Crawford-port får du en fast pris du kan stole på - helt uden overraskelse" Her er CRAWFORD tagged, men ikke resten(!)
     - BUT in above example - Crawford-port is a single token(!)
-
 
 Regel: ??? NOT CLEAR. Websites are tagged as Organization or Product if they are explicitly mentioned as such.
 Hvorfor?: 
@@ -50,6 +59,34 @@ Eksempler:
     - "Web samlerabat Berlingske.dk + Business.dk"
     - "Du kan i mellemtiden læse alle artikler på B.dk og Business.dk eller læse e-avisen gratis her"
 
+Regel: Tidsrum TIME skal tagges som en hel stor entity, frem for separate.
+Hvorfor?
+    - Ontonotes skriver om dates:" [from the fall of 1962 through the spring of 1967] 
+Eksempler:
+    - "16 – 18 i Multihuset"
+
+Regel: Kontaktinformation tagger jeg allgievel. Det er meget uklart hvornår noget er adresser og hvornår noget er kontaktinformation.
+Hvorfor? UNCLEAR !!!
+    - Ontonotes: "For address, break it down into several mentions. For example, 2899 Xietu Road, Room 207, 
+Shanghai City“上海市斜土路二八九九 号二零七室”, tag [Shanghai City] [上海市] as a GPE, 
+[Xietu Road] [斜土路] as a Facility, [2899] as a Cardinal, and [207] as another Cardinal."
+    - Ontonotes: "Unmarkable: Contact Information   - Nothing should be marked in "cnn.com," "1600 Pennsylvania Ave," or "1-800-555-1234"
+    - Det giver simpelthen ingen mening IKKE at tagge PERSON i følgende sætning:
+        - "Centerchef, Jesper Olsen, jeol@nykredit.dk, Englandsvej 376, 2770 Kastrup, 44 55 32 72"
+
+Regel: Brætspil er WORK OF ART, også spil, medmindre det specifikt bliver omtalt som ORGANIZATION eller PRODUCT
+Hvorfor?:
+    OntonoteS: "Titles of books, songs, television programs and other creations". Det må tælle som other creations
+Eksempler:
+    - "Pac-Man Kryds og bolle"
+
+Regel: Firmaer der ender på "ApS" Eller "A/S"
+Hvorfor?:
+    - Det er en del af organisationens navn.
+
+Regel: FN og EU er organisationer og ikke GPE'S
+
+
 Regel: If insufficient context to determine tag, exclude (red cross)
 Eksempler:
     - "Volstrup" -> Could be GPE or PER
@@ -63,6 +100,13 @@ Regel: If a mention includes a time, day, month, and year, all these should be i
 Hvorfor?: 
     - Står i ontonotes-named-entity-guidelines
 
+Regel: Twitter brugernavne (eller andre) tagges som PER eller ORG
+Hvorfor?:
+    - Kenneth siger det giver meaning
+    - Det er på sin vis et "nickname"
+Eksempel:
+    - "Find mig på Facebook @virkeligvoksen"
+
 Regel: S-tog er facility.
 Hvorfor?: Facility indebærer infrastruktur
 Eksempel:
@@ -73,9 +117,58 @@ Hvorfor?: It is not stated int he NER guidelines
 Eksempel:
     - "Teknisk afdeling har valgt en Bürstner Club 465 TN årgang 1995 til månedens brugtvognstest"
 
-Regel: "Den" tages med i date. Ligesom på Engelsk i Ontonotes eksempler (selvom det ikke er stated)
+Regel: "Den" tages IKKE med i DATE BORTSET fra for . Ligesom på Engelsk i Ontonotes eksempler (selvom det ikke er stated)
+OBS UNCLEAR!!!! 
+    - In DATE it says: "[the 1940’s]" and "[the fall of 2008]"
+    - In supplementary material it says: "Do NOT include determiners or articles in the extent 
+  For "the White House" and "the US," mark only [White House] and [US]"
 Hvorfor?: Det gør det i Ontonotes eksempler:
     - ""Unlike the 20th century" The er her med i DATE
+    - In "the 21st of last November" The er her IKKE indkluderet.
 Eksempel:
     - "bringe nekrologen allerede den 22. december 1995."
 
+Regel: Tidsperioder kortere end en dag tagges som TIME, også selvom de ikke siger et specifikt tidspunkt
+Hvorfor?: Det gør det i Ontonotes eksempler:
+    - ""Give me five minutes and a team" -> Five minutes er tagget
+Eksempel:
+    - "formanden heller ikke kunne opfordre de unge mennesker til at afslutte deres indlæg efter fire minutter, trak mødet længere ud." Skal også tagges med TIME
+
+Regel: Bekendtgørelser tæller som LAW:
+Hvorfor?: Definitionen på en bekendtgørelse: Bekendtgørelse. Regler, der uddyber eller præciserer reglerne i en lov.
+Eksempel:
+    - "var fastsat i dagældende bekendtgørelse nr. 304 af 14. maj 1991 om støj fra vindmøller."
+
+Regel: Dyr m. navne indkluderes ikke som PERSON, medmindre de er fiktionelle, antropomorphic karakterer.
+Hvorfor?
+Eksempel:
+    - "Hesten Abildgraa" - Tagges IKKE
+
+Regel: Tekster hvor der er meget lidt kontekst indkluderes, hvis der kan googles frem til det rigtige svar.
+Hvorfor?: Modellen burde tage disse i brug, selvom det er problematisk hvis der samples for mange af disse.
+Eksempel:
+    - "De Himmelskes Afskedsbred, 1814" -> Work of art + DATE
+
+Regel: Århundreder/centuries tagges med som DATE
+Hvorfor?: Det gør de i Ontonotes:
+    - ""Unlike the 20th century" The er her med i DATE
+
+Regel: Jubilæer tælles med
+Hvorfor?: Ontonotes skriver at følgende tages med: "[our fourth quarter]". Dette er et lignende eksempel. E.g. "Our 5 year anniversary"
+
+Regel: Hvis noget er skrevet helt forkert, så smides teksten ud
+Eksempel:
+    -"september 20164"
+
+Regel: Addresser adress chunkes op
+Hvorfor? 
+    - Ontonotes: "For address, break it down into several mentions. For example, 2899 Xietu Road, Room 207, 
+    Shanghai City“上海市斜土路二八九九 号二零七室”, tag [Shanghai City] [上海市] as a GPE, 
+    [Xietu Road] [斜土路] as a Facility, [2899] as a Cardinal, and [207] as another Cardinal""
+
+Regel: Mål med flere dimensioner skrives som en enkelt quantity:
+Hvorfor?
+    - Ontonotes:
+        - ""Seawater rushes through the 20 x 40-foot hole."
+Eksempel:
+    - "mål (HxBxD), mm 1690x515x485 Indv"

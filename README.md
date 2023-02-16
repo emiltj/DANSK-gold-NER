@@ -609,7 +609,7 @@ prodigy review rater_4_single_gold_all rater_4_single_unprocessed,rater_4_single
 prodigy review rater_5_single_gold_all rater_5_single_unprocessed,rater_5_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 
 prodigy review rater_6_single_gold_all rater_6_single_unprocessed,rater_6_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
-
+# Now doing rater_7
 prodigy review rater_7_single_gold_all rater_7_single_unprocessed,rater_7_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 
 prodigy review rater_8_single_gold_all rater_8_single_unprocessed,rater_8_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
@@ -632,9 +632,9 @@ python src/preprocessing/split_by_answer_rater_3_9_single_gold.py
     - Creates in db:
         - rater_{r}_single_gold_ignored_resolved
 ```bash
-prodigy mark rater_3_single_gold_ignored_resolved dataset:rater_3_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+#None prodigy mark rater_3_single_gold_ignored_resolved dataset:rater_3_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_4_single_gold_ignored_resolved dataset:rater_4_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+#None prodigy mark rater_4_single_gold_ignored_resolved dataset:rater_4_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
 prodigy mark rater_5_single_gold_ignored_resolved dataset:rater_5_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
@@ -673,57 +673,35 @@ prodigy db-merge rater_3_single_gold,rater_4_single_gold,rater_5_single_gold,rat
 prodigy db-merge gold-single,gold-multi-and-gold-rater-1-single, gold-full
 ```
 
+- **Use script subset cases where regex pattern occurs, so they may be split and reviewed**
+    - E.g.:
+        - den 14. april (remove den) - har førhen rettet forkert fordi det er uklart i ontonotes. (dog ikke hvis der tales om århundreder)
+        - adresser er forkerte - de skal chunkes op til cardinals, faciities og GPE (jævnfør kinesiske ekstra regler). brug evt. regex til at finde tokens der slutter på "vej" eller "gade", og subset disse og gennemgå manuelt
+        - Telefonnumre (Ontonotes siger at kontaktinformationer ikke skal tagges)
+        - Har tagget adresser, selvom det er kontaktinformationer, fordi det er så uklart.
+        - Hjemmesider. Er ikke blevet tagget konsistent
+        - FN og EU er organisationer men ikke nødvendigvis tagget konsistent
+        - Tidsrum (ofte skrevet som 18:00 - 20:00), har jeg tagget som enkelte TIME entities. De burde IKKE være separate, men det har jeg sommetider gjort dem til.
+
 - **Calculate how many tags there are of each type**
 ```bash
 ?????
 ```
 
-- **
-
-
-
-
-
-# Only written out steps to here(!)
-# Below add:
-- Add language and product predictions to single gold combined
-- Resolve them
-- Add overwrite the resolved in single gold combined (see above way of doing it)
-- Merge the single-gold-combined with extra lang+prod into the gold-multi-and-gold-rater-1-single
-- Have it be NER manual instead (see above way of doing it)
-...???
-
-- **Merge all gold datasets in db**
-
-
-
-
-
-
-
-
-- **Potentially. Make appropriate changes on gold-standard-multi data based on the assessment between rater and model**
-
-- **Potentially. Re-train model on new gold-standard-multi data**
-
-- **Potentially. Re-predict on single data for each rater**
-
-- **Potentially. Re-assess agreement between rater and model**
-
-- **Potentially. Repeat above process**
-
-- **Manually resolve conflicts in single data (between model predictions and annotators)**
-    - Save the gold-single dataset
-
-- **Merge gold-single and gold-multi dataset into gold-dansk**
-
-- **Review any potential extra processing of the tags and/or texts**
-    - Go through the documents in "resolved edge cases"
+- **If few of some tags, add tags**
 ```bash
-code resolved_edge_cases/other_thoughts.txt
+# Empty unless few tags of some of them
 ```
 
-- **Save gold-dansk**
+- **Train a new model**
+
+- **Use model to predict on all data**
+
+- **Review cases where model and data disagrees**
+
+- **Use newly reviewed data to train a new model**
+
+- **Evaluate performance, and do qualitative error analysis**
 
 - **Nice to do, not need to do, depends also on performance**
     - Predict on bad labels (e.g. product and language) on existing dataset, and subsequently use prodigy review on only these docs
@@ -741,6 +719,7 @@ code resolved_edge_cases/other_thoughts.txt
     - Ensure that relevant information on Weights and Biases (wandb) is saved so I can use for report. 
     https://docs.wandb.ai/guides/integrations/spacy
     - Packaging to centre-for-humanities-computing
+
 
 
 ## Named Entity Recognition (NER) tagging guidelines
