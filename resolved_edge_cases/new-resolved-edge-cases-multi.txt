@@ -18,6 +18,12 @@ Hvorfor?: PERSON der er fiktive er også med
 Eksempler:
     - Midgård
 
+Regel: Hoteller er facilities, medmindre det er eksplicit snakket om som ORG
+Hvorfor?: Ontonotes har tagget sådan
+
+Regel: Øer er Location, medmindre det er et selvstændigt land/repuplik
+Hvorfor?: Det giver bare mening
+
 Regel: Words such as "Vestjysk" are not NORPS unless the area they refer to is a GPE, rather than a LOCATION.
 Hvorfor?: Ontonotes states that NORP's have to refer to GPE's.
 Eksempler: "For et år siden var et vestjysk parcel- eller rækkehus til salg i 117 dage, før det blev solgt." -> Since Vestjylland is a location, rather than a GPE it should not be tagged.
@@ -139,6 +145,16 @@ Hvorfor?: Definitionen på en bekendtgørelse: Bekendtgørelse. Regler, der uddy
 Eksempel:
     - "var fastsat i dagældende bekendtgørelse nr. 304 af 14. maj 1991 om støj fra vindmøller."
 
+Regel: "Do not have words other than the dates for those that mark duration"
+UNCLEAR(!):
+    - In the last example in the following, they include it.
+    "Extent should include modifiers & prepositions that denote specific time, such as [2 days ago], 
+    [the past two days], but not those that mark duration, such as "for [2 days]." Do not separate 
+    mentions into their component parts: [November 2, 2001] and [from the fall of 1962 through the 
+    spring of 1967] "
+Eksempler:
+    - "25 procent af virksomhederne havde oplevet disruption inden for de seneste fem år, og 25 procent forventede at blive udsat for disruption inden for de næste fem år"
+
 Regel: Dyr m. navne indkluderes ikke som PERSON, medmindre de er fiktionelle, antropomorphic karakterer.
 Hvorfor?
 Eksempel:
@@ -172,3 +188,14 @@ Hvorfor?
         - ""Seawater rushes through the 20 x 40-foot hole."
 Eksempel:
     - "mål (HxBxD), mm 1690x515x485 Indv"
+
+
+Regel: I cases hvor der er tale om et delkomponent eller en gruppering af et Entity tagges det ikke
+UNCLEAR: No comments in Ontonotes
+Eksempler:
+    - "Major League Soccer-klubben" Skal IKKE indkluderes
+
+Regel: Princesse, Dronning mv. indgår IKKE i PERSON:
+HVorfor?: Ontonotes: "and occupational titles (President, Secretary) are NOT included."
+Eksempler:
+    - "Prins Joachim PERSONog Prinsesse Marie PERSONmed deres to børn er i Paris, hvor Prins Joachim PERSONefteruddanner sig"

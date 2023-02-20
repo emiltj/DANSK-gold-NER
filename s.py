@@ -4,7 +4,8 @@ from zshot.linker import LinkerRegen
 from zshot.mentions_extractor import MentionsExtractorSpacy
 from zshot.utils.data_models import Entity
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
+
 # zero shot definition of entities
 nlp_config = PipelineConfig(
     mentions_extractor=MentionsExtractorSpacy(),

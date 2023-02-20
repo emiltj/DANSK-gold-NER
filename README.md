@@ -598,7 +598,7 @@ prodigy drop rater_2_single_unprocessed_preds
 prodigy drop rater_10_single_unprocessed_preds
 ```
 
-# GOTTEN TO HERE
+
 
 - **Review raters 3, 4, 5, 6, 7, 8, 9**
 ```bash
@@ -609,7 +609,7 @@ prodigy review rater_4_single_gold_all rater_4_single_unprocessed,rater_4_single
 prodigy review rater_5_single_gold_all rater_5_single_unprocessed,rater_5_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 
 prodigy review rater_6_single_gold_all rater_6_single_unprocessed,rater_6_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
-# Now doing rater_7
+
 prodigy review rater_7_single_gold_all rater_7_single_unprocessed,rater_7_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 
 prodigy review rater_8_single_gold_all rater_8_single_unprocessed,rater_8_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
@@ -617,15 +617,51 @@ prodigy review rater_8_single_gold_all rater_8_single_unprocessed,rater_8_single
 prodigy review rater_9_single_gold_all rater_9_single_unprocessed,rater_9_single_unprocessed_preds --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 ```
 
-- **Split the rater_3_single_gold_all**
-    - Creates new files:
-        - ./data/single/gold/rater_{r}/rater_{r}_single_gold_all.jsonl
-    - Creates new in db:
-        - rater_{r}_single_gold_accepted
-        - rater_{r}_single_gold_ignored
-        - rater_{r}_single_gold_rejected
+- **Save all reviewed data**
+    - Creates files:
+        - data/single/gold/rater_{r}/rater_{r}_single_gold_all.jsonl
 ```bash
-python src/preprocessing/split_by_answer_rater_3_9_single_gold.py
+prodigy db-out rater_3_single_gold_all data/single/gold/rater_3
+prodigy db-out rater_4_single_gold_all data/single/gold/rater_4
+prodigy db-out rater_5_single_gold_all data/single/gold/rater_5
+prodigy db-out rater_6_single_gold_all data/single/gold/rater_6
+prodigy db-out rater_7_single_gold_all data/single/gold/rater_7
+prodigy db-out rater_8_single_gold_all data/single/gold/rater_8
+prodigy db-out rater_9_single_gold_all data/single/gold/rater_9
+```
+
+- **Merge all the reviewed rater data**
+    - Creates in DB:
+        - single-gold-all
+        - single-gold-accept
+        - single-gold-reject
+        - single-gold-ignore
+    Creates in folders:
+        - data/single/gold/combined/single-gold-all.jsonl
+        - data/single/gold/combined/single-gold-accept.jsonl
+        - data/single/gold/combined/single-gold-reject.jsonl
+        - data/single/gold/combined/single-gold-ignore.jsonl
+```bash
+prodigy db-merge rater_3_single_gold_all,rater_4_single_gold_all,rater_5_single_gold_all,rater_6_single_gold_all,rater_7_single_gold_all,rater_8_single_gold_all,rater_9_single_gold_all single-gold-all
+python src/preprocessing/single-gold-split.py
+prodigy db-out single-gold-all data/single/gold/combined/
+prodigy db-out single-gold-accept data/single/gold/combined/
+prodigy db-out single-gold-reject data/single/gold/combined/
+prodigy db-out single-gold-ignore data/single/gold/combined/
+```
+
+- **Get info on number of accepted and rejected**
+    - Retrieved info:
+        {'name': 'rater_3_single_gold_all', 'full_len': 1526, 'accept_len': 1440, 'reject_len': 86, 'ignore_len': 0}
+        {'name': 'rater_4_single_gold_all', 'full_len': 2477, 'accept_len': 2380, 'reject_len': 97, 'ignore_len': 0}
+        {'name': 'rater_5_single_gold_all', 'full_len': 1402, 'accept_len': 1379, 'reject_len': 23, 'ignore_len': 0}
+        {'name': 'rater_6_single_gold_all', 'full_len': 2259, 'accept_len': 2144, 'reject_len': 115, 'ignore_len': 0}
+        {'name': 'rater_7_single_gold_all', 'full_len': 1902, 'accept_len': 1823, 'reject_len': 79, 'ignore_len': 0}
+        {'name': 'rater_8_single_gold_all', 'full_len': 1698, 'accept_len': 1632, 'reject_len': 66, 'ignore_len': 0}
+        {'name': 'rater_9_single_gold_all', 'full_len': 2109, 'accept_len': 2011, 'reject_len': 98, 'ignore_len': 0}
+        {'name': 'single-gold', 'full_len': 13373, 'accept_len': 12809, 'reject_len': 564, 'ignore_len': 0}
+```bash
+src/data_assessment/descriptive_stats.py
 ```
 
 - **Resolve ignored cases in rater_{r}_single_gold_ignored**
@@ -636,52 +672,167 @@ python src/preprocessing/split_by_answer_rater_3_9_single_gold.py
 
 #None prodigy mark rater_4_single_gold_ignored_resolved dataset:rater_4_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_5_single_gold_ignored_resolved dataset:rater_5_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+#None for the rest
+# prodigy mark rater_5_single_gold_ignored_resolved dataset:rater_5_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_6_single_gold_ignored_resolved dataset:rater_6_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+# prodigy mark rater_6_single_gold_ignored_resolved dataset:rater_6_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_7_single_gold_ignored_resolved dataset:rater_7_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+# prodigy mark rater_7_single_gold_ignored_resolved dataset:rater_7_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_8_single_gold_ignored_resolved dataset:rater_8_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+# prodigy mark rater_8_single_gold_ignored_resolved dataset:rater_8_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 
-prodigy mark rater_9_single_gold_ignored_resolved dataset:rater_9_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+# prodigy mark rater_9_single_gold_ignored_resolved dataset:rater_9_single_gold_ignored --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
 ```
 
 - **Dump the rater_{r}_single_gold_ignored**
 ```bash
-prodigy db-out rater_{r}_single_gold_ignored data/single/gold/rater_{r}
+#prodigy db-out rater_{r}_single_gold_ignored data/single/gold/rater_{r}
 ```
 
 - **Merge the rater_{r}_single_gold_ignored and the rater_{r}_single_gold_accepted**
     - Creates in db:
         - rater_{r}_single_gold
 ```bash
-prodigy db-merge rater-{r}-single-gold-accepted,rater-{r}-single-gold-ignored rater_{r}_single_gold
+#prodigy db-merge rater-{r}-single-gold-accepted,rater-{r}-single-gold-ignored rater_{r}_single_gold
 ```
 
 - **Merge all single_gold dataset in db**
     - Creates in db:
         - gold-single
 ```bash
-prodigy db-merge rater_3_single_gold,rater_4_single_gold,rater_5_single_gold,rater_6_single_gold,rater_7_single_gold,rater_8_single_gold,rater_9_single_gold gold-single
+#prodigy db-merge rater_3_single_gold,rater_4_single_gold,rater_5_single_gold,rater_6_single_gold,rater_7_single_gold,rater_8_single_gold,rater_9_single_gold gold-single
 ```
 
-- **Merge all gold datasets in db**
+- **Merge all gold datasets in db and save as files**
     - Creates in db:
         - gold-full
+    - Creates in folders:
+        - data/full/gold/gold-full.jsonl
+        - data/full/gold/gold-full.spacy
 ```bash
-prodigy db-merge gold-single,gold-multi-and-gold-rater-1-single, gold-full
+prodigy db-merge single-gold-accept,gold-multi-and-gold-rater-1-single gold-full
+prodigy db-out gold-full data/full/gold/
+prodigy data-to-spacy data/full/gold/ --ner gold-full --lang "da" --eval-split 0
+mv data/full/gold/train.spacy data/full/gold/gold-full.spacy
+rm data/full/gold/config.cfg
+rm -rf data/full/gold/labels
 ```
 
-- **Use script subset cases where regex pattern occurs, so they may be split and reviewed**
+- **Use a script to filter away cases where regex pattern matches a common mistake so it may be reviewed**
     - E.g.:
-        - den 14. april (remove den) - har førhen rettet forkert fordi det er uklart i ontonotes. (dog ikke hvis der tales om århundreder)
-        - adresser er forkerte - de skal chunkes op til cardinals, faciities og GPE (jævnfør kinesiske ekstra regler). brug evt. regex til at finde tokens der slutter på "vej" eller "gade", og subset disse og gennemgå manuelt
+        - den 14. april (remove den)
+            - Do NOT include determiners or articles in the extent
+            - Include in "det første århundrede"
+            - Include in 
+        - Adresser
+            - Chunk up into cardinals, faciities og GPE (jævnfør kinesiske ekstra regler: "For address, break it down into several mentions. For example, 2899 Xietu Road, Room 207, Shanghai City“上海市斜土路二八九九 号二零七室”, tag [Shanghai City] [上海市] as a GPE, [Xietu Road] [斜土路] as a Facility, [2899] as a Cardinal, and [207] as another Cardinal.")
+            - Completely contrasting the other rule "Nothing should be marked in "cnn.com," "1600 Pennsylvania Ave," or "1-800-555-"
         - Telefonnumre (Ontonotes siger at kontaktinformationer ikke skal tagges)
-        - Har tagget adresser, selvom det er kontaktinformationer, fordi det er så uklart.
+            - Should not be tagged. "Numerals, including whole numbers, fractions, and decimals, that provide a count or quantity and do not fall under a unit of measurement, money, percent, date or time"
         - Hjemmesider. Er ikke blevet tagget konsistent
+            - Nothing should be marked in "cnn.com," "1600 Pennsylvania Ave," or "1-800-555-"
         - FN og EU er organisationer men ikke nødvendigvis tagget konsistent
-        - Tidsrum (ofte skrevet som 18:00 - 20:00), har jeg tagget som enkelte TIME entities. De burde IKKE være separate, men det har jeg sommetider gjort dem til.
+            - Should be tagged as organizations, rather than GPE
+        - Tidsrum (ofte skrevet som 18:00 - 20:00)
+            - Durations should be marked inclusively: [from 1995 to 2000]
+        - Dates:
+            - Durations should be marked inclusively: [from 1995 to 2000]
+        - Hotels and resorts
+            - Marked as facilities rather than ORGANIZATIONS
+        - Cardinals med bogstaver i. Cardinals med /, cardinals med .
+            - No letters or / are allowed
+            - "Numerals, including whole numbers, fractions, and decimals, that provide a count or quantity and do not fall under a unit of measurement, money, percent, date or time"
+        - Ret (såsom Fortrydelsesret og Ophavsret og Menneskerettigheder)
+            - Inkluderes ikke. De inkluderes kun hvis der bliver nævnt "Ophavsretsloven"
+        - Ytringsfrihed
+            - Ytringsfrihed er noget vi har, som følge af lovgivningen, og er derfor ikke en lovgivning i sig selv.
+        - Copyright og ®
+            - Er ikke en lov - inkluderes ikke.
+        - ORG som ender på ApS eller A/S skal være med i tagget (og der det vist hovedsageligt også)
+            - Cadbury Schweppes Australia Ltd. er tagget, men uden .
+    - Creates in folders:
+        - data/full/gold/gold-bad.spacy
+        - data/full/gold/gold-good.spacy
+    - Creates in db:
+        - gold-good
+        - gold-bad
+```bash
+src/preprocessing/regex_filter.ipynb
+python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/gold-good.spacy blank:da --ner > data/full/gold/gold-good.jsonl
+python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/gold-bad.spacy blank:da --ner > data/full/gold/gold-bad.jsonl
+python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/gold-bad-no-tags.spacy blank:da --ner > data/full/gold/gold-bad-no-tags.jsonl
+prodigy db-in gold-bad data/full/gold/gold-bad.jsonl
+prodigy db-in gold-good data/full/gold/gold-good.jsonl
+prodigy db-in gold-bad-no-tags data/full/gold/gold-bad-no-tags.jsonl
+```
+
+# GOTTEN TO HERE
+
+- **Review the bad cases**
+```bash
+prodigy review gold-bad-resolved gold-bad,gold-bad-no-tags --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
+#prodigy review gold-bad-resolved gold-bad --view-id ner --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S
+#prodigy mark gold-bad-resolved dataset:gold-bad --view-id review --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+#prodigy mark gold-bad-resolved dataset:gold-bad --view-id ner --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT
+```
+
+- **Merge gold-bad-resolved and gold-good**
+    - Creates in db:
+        - gold
+    - Creates in folders:
+        - data/full/gold/gold.spacy
+        - data/full/gold/gold.jsonl
+```bash
+prodigy db-merge gold-bad-resolved,gold-good gold
+prodigy db-out gold data/full/gold/
+prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split 0
+mv data/full/gold/train.spacy data/full/gold/gold.spacy
+rm data/full/gold/config.cfg
+rm -rf data/full/gold/labels
+```
+
+- **Assess interrater reliability of model and annotators**
+```bash
+# OOOPS! NEED TO INCLUDE ALL DATA FROM ANNOTATORS, NOT JUST THE SPARSE OVERLAPPING DATA
+#src/data_assessment/interrater_reliability/interrater_reliability_final.ipynb
+```
+
+# Go through: https://github.com/explosion/spaCy/discussions/12307 
+
+
+
+
+
+
+
+
+
+Vigtig info fra møde m. Kenneth:
+	- Når jeg er færdig med DANSK, lav da interrater reliability test igen, men denne gange også med "the true values" fra datasættet. Brug dette i paperet som en måde hvorpå jeg kan validere datasættet (hvis der er høj interrater reliability). Hvis den er lav, få da Kenneth, Rebekah eller en uvildig til at gennemgå nogle og se uenigheden dér.
+	- Lav post på spaCy forum: Hvordan håndterer spaCy training missing values? Jeg har 2 datasæt, hvoraf den ene indeholder NER tags og den anden indeholder POS og Dependency Parsing. Kan jeg merge dette data og træne uden at NER komponenten bliver opdateret i tilfælde af batches med data uden NER? Og vice versa? Og hvordan sikrer jeg mig at spacy train håndterer det som "missing value" og ikke bare som om at der ER tagget, men at der ikke var nogen tags? https://github.com/explosion/spaCy/discussions/12307 
+	- Til den endelige træning, brug da følgende modeller (valgt ud fra https://scandeval.github.io/nlu-benchmark/):
+		○ Jonfd-nordic (i stedet for ælectra)
+		○ Nb-scandi (i stedet for DaBERT)
+		○ Dfm-bert-large (i stedet for XLM-R). Alternativt xlm-r, hvis jeg inkluderer ontonotes engelsk i træning også.
+	- Til den endelige træning, merge DDT med DANSK, men fjern al NER fra DDT, således at det er missing values under træningen.
+	- Til den endelige træning, overvej at lægge engelsk ontonotes ind også
+    - Til den endelige træning, opskalér da DDT, så det ikke fylder for lidt
+	- Til den endelige træning, lav da en fork af DaCy med en ny mappe under "training", som her er lavet i helt samme stil som kenneths sidste.
+	- Til den endelige træning, lav da en "final-model" og en "final-model-no-test". No-test versionen kan bruges til at replikere, mens den anden kan bruges i praksis. Hvis for doven, lav da kun en "final-model-no-test"
+	- Til evaluering af performance på testsættet, overvej da at bruge flere evalueringsmetoder, vha. "scorer"
+	- DANSK behøver ikke udgives før DaCy kan trænes på det (unpublished dataset yet to be published)
+	- DANSK kan udgives på et hemmeligt datascience link til specialet, hvis det skulle være nødvendigt
+    - DaCy behøves i princippet ikke udgives helt til specialet, men kan ligge på en ny branch
+
+
+
+
+
+
+
+
+
+
 
 - **Calculate how many tags there are of each type**
 ```bash
