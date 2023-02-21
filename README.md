@@ -720,8 +720,14 @@ rm -rf data/full/gold/labels
 
 - **Use a script to filter away cases where regex pattern matches a common mistake so it may be reviewed**
     - E.g.:
+        - GUD (remove)
+        - Himlen (remove)
+        - Tal m. bogstaver (add dem)
+        - All Cardinals med / og :
         - den 14. april (remove den)
             - Do NOT include determiners or articles in the extent
+            - However, we INCLUDE IT(!) if no month and year is shown. It is not a date without it.
+                - "d. [11 Juni 1814]", "[Vi skal betale fra her den 1.]", "den [30. april 2015]"
             - Include in "det første århundrede"
             - Include in 
         - Adresser
@@ -731,6 +737,7 @@ rm -rf data/full/gold/labels
             - Should not be tagged. "Numerals, including whole numbers, fractions, and decimals, that provide a count or quantity and do not fall under a unit of measurement, money, percent, date or time"
         - Hjemmesider. Er ikke blevet tagget konsistent
             - Nothing should be marked in "cnn.com," "1600 Pennsylvania Ave," or "1-800-555-"
+            - MEDMINDRE det specifikt bliver nævnt som en organization
         - FN og EU er organisationer men ikke nødvendigvis tagget konsistent
             - Should be tagged as organizations, rather than GPE
         - Tidsrum (ofte skrevet som 18:00 - 20:00)
@@ -764,9 +771,8 @@ python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/gold-bad-no-ta
 prodigy db-in gold-bad data/full/gold/gold-bad.jsonl
 prodigy db-in gold-good data/full/gold/gold-good.jsonl
 prodigy db-in gold-bad-no-tags data/full/gold/gold-bad-no-tags.jsonl
+git status
 ```
-
-# GOTTEN TO HERE
 
 - **Review the bad cases**
 ```bash
@@ -790,6 +796,8 @@ mv data/full/gold/train.spacy data/full/gold/gold.spacy
 rm data/full/gold/config.cfg
 rm -rf data/full/gold/labels
 ```
+
+# GOTTEN TO HERE
 
 - **Assess interrater reliability of model and annotators**
 ```bash
