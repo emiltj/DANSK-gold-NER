@@ -759,10 +759,12 @@ rm -rf data/full/gold/labels
             - Cadbury Schweppes Australia Ltd. er tagget, men uden .
     - Creates in folders:
         - data/full/gold/gold-bad.spacy
+        - data/full/gold/gold-bad-no-tags.spacy
         - data/full/gold/gold-good.spacy
     - Creates in db:
         - gold-good
         - gold-bad
+        - gold-bad-no-tags
 ```bash
 src/preprocessing/regex_filter.ipynb
 python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/gold-good.spacy blank:da --ner > data/full/gold/gold-good.jsonl
@@ -775,6 +777,7 @@ git status
 ```
 
 - **Review the bad cases**
+    - YIELDED 449 CASES THAT WERE GONE THROUGH
 ```bash
 prodigy review gold-bad-resolved gold-bad,gold-bad-no-tags --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
 #prodigy review gold-bad-resolved gold-bad --view-id ner --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S
@@ -786,13 +789,35 @@ prodigy review gold-bad-resolved gold-bad,gold-bad-no-tags --label PERSON,NORP,F
     - Creates in db:
         - gold
     - Creates in folders:
-        - data/full/gold/gold.spacy
-        - data/full/gold/gold.jsonl
+        - data/full/gold/dansk.spacy
+        - data/full/gold/dansk.jsonl
 ```bash
 prodigy db-merge gold-bad-resolved,gold-good gold
 prodigy db-out gold data/full/gold/
 prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split 0
-mv data/full/gold/train.spacy data/full/gold/gold.spacy
+mv data/full/gold/train.spacy data/full/gold/dansk.spacy
+mv data/full/gold/gold.jsonl data/full/gold/dansk.jsonl
+rm data/full/gold/config.cfg
+rm -rf data/full/gold/labels
+```
+
+- **Split dansk up into train, dev, test**'
+    - Creates in folders:
+        - data/full/gold/dansk_train.spacy (.7 of full)
+        - data/full/gold/dansk_dev.spacy (.15 of full)
+        - data/full/gold/dansk_test.spacy (.15 of full)
+    - Creates in db:
+        - dansk_dev
+```bash
+prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split .3
+mv data/full/gold/train.spacy data/full/gold/dansk_train.spacy
+mv data/full/gold/dev.spacy data/full/gold/dansk_dev.spacy
+python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/dansk_dev.spacy blank:da --ner > data/full/gold/dansk_dev.jsonl
+prodigy db-in dansk_dev data/full/gold/dansk_dev.jsonl
+prodigy data-to-spacy data/full/gold/ --ner dansk_dev --lang "da" --eval-split .5
+mv data/full/gold/dev.spacy data/full/gold/dansk_dev.spacy
+mv data/full/gold/train.spacy data/full/gold/dansk_test.spacy
+
 rm data/full/gold/config.cfg
 rm -rf data/full/gold/labels
 ```
