@@ -822,11 +822,33 @@ rm data/full/gold/config.cfg
 rm -rf data/full/gold/labels
 ```
 
+- **Get DaNE**
+    - Creates in folders:
+        - data/dane/dane_train.conllu
+        - data/dane/dane_dev.conllu
+        - data/dane/dane_test.conllu
+        - data/dane/dane_train.spacy
+        - data/dane/dane_dev.spacy
+        - data/dane/dane_test.spacy
+        - data/dane/dane.spacy
+```bash
+python src/get_dane.py
+python -m spacy convert data/dane/dane_dev.conllu data/dane/ --converter conllu --merge-subtokens -n 10
+python -m spacy convert data/dane/dane_train.conllu data/dane/ --converter conllu --merge-subtokens -n 10
+python -m spacy convert data/dane/dane_test.conllu data/dane/ --converter conllu --merge-subtokens -n 10
+python src/merge_dane.py
+```
+
+- **Upload to sciencedata.dk
+```bash
+# Manually
+````
+
+
 # GOTTEN TO HERE
 
 - **Assess interrater reliability of model and annotators**
 ```bash
-# OOOPS! NEED TO INCLUDE ALL DATA FROM ANNOTATORS, NOT JUST THE SPARSE OVERLAPPING DATA
 #src/data_assessment/interrater_reliability/interrater_reliability_final.ipynb
 ```
 
