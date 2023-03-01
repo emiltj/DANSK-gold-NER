@@ -803,23 +803,43 @@ rm -rf data/full/gold/labels
 
 - **Split dansk up into train, dev, test**'
     - Creates in folders:
-        - data/full/gold/dansk_train.spacy (.7 of full)
-        - data/full/gold/dansk_dev.spacy (.15 of full)
-        - data/full/gold/dansk_test.spacy (.15 of full)
+        - data/full/gold/dansk_train.spacy (.8 of full)
+        - data/full/gold/dansk_dev.spacy (.10 of full)
+        - data/full/gold/dansk_test.spacy (.10 of full)
     - Creates in db:
-        - dansk_dev
+        - dansk_test
 ```bash
-prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split .3
+prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split .2
 mv data/full/gold/train.spacy data/full/gold/dansk_train.spacy
-mv data/full/gold/dev.spacy data/full/gold/dansk_dev.spacy
-python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/dansk_dev.spacy blank:da --ner > data/full/gold/dansk_dev.jsonl
-prodigy db-in dansk_dev data/full/gold/dansk_dev.jsonl
-prodigy data-to-spacy data/full/gold/ --ner dansk_dev --lang "da" --eval-split .5
-mv data/full/gold/dev.spacy data/full/gold/dansk_dev.spacy
-mv data/full/gold/train.spacy data/full/gold/dansk_test.spacy
+mv data/full/gold/test.spacy data/full/gold/dansk_test.spacy
+python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/dansk_test.spacy blank:da --ner > data/full/gold/dansk_test.jsonl
+prodigy db-in dansk_t data/full/gold/dansk_test.jsonl
+prodigy data-to-spacy data/full/gold/ --ner dansk_t --lang "da" --eval-split .5
+mv data/full/gold/test.spacy data/full/gold/dansk_test.spacy
+mv data/full/gold/train.spacy data/full/gold/dansk_dev.spacy
 
 rm data/full/gold/config.cfg
 rm -rf data/full/gold/labels
+```
+
+- **Assess number of tags in each split**
+#    - Train: {'ORGANIZATION': 1959, 'GPE': 1284, 'DATE': 1406, 'FACILITY': 195, 'CARDINAL': 1718, 'TIME': 180, 'PRODUCT': 598, 'PERSON': 1698, 'WORK OF ART': 322, 'LOCATION': 315, 'NORP': 374, 'QUANTITY': 235, 'PERCENT': 113, 'EVENT': 155, 'LANGUAGE': 64, 'LAW': 141, 'ORDINAL': 99, 'MONEY': 550}
+
+
+#    - Dev: {'DATE': 183, 'FACILITY': 22, 'CARDINAL': 172, 'GPE': 172, 'ORGANIZATION': 293, 'TIME': 18, 'MONEY': 80, 'PERSON': 205, 'EVENT': 17, 'NORP': 60, 'LANGUAGE': 4, 'LOCATION': 63, 'WORK OF ART': 54, 'ORDINAL': 19, 'QUANTITY': 27, 'PERCENT': 18, 'LAW': 21, 'PRODUCT': 83}
+
+
+#    - Test: {'ORGANIZATION': 255, 'WORK OF ART': 43, 'TIME': 20, 'LOCATION': 46, 'GPE': 148, 'PERSON': 230, 'CARDINAL': 206, 'DATE': 167, 'FACILITY': 29, 'ORDINAL': 9, 'MONEY': 84, 'PERCENT': 17, 'NORP': 61, 'QUANTITY': 30, 'EVENT': 39, 'LAW': 21, 'LANGUAGE': 58, 'PRODUCT': 82}
+
+    - Other script split:
+
+    -   This new serialized DocBin 'train.spacy' contains the following number of entity tags: {'GPE': 1276, 'DATE': 1411, 'NORP': 405, 'QUANTITY': 242, 'CARDINAL': 1702, 'TIME': 185, 'WORK OF ART': 335, 'ORGANIZATION': 1960, 'PRODUCT': 634, 'PERSON': 1767, 'ORDINAL': 105, 'PERCENT': 123, 'LAW': 148, 'MONEY': 566, 'FACILITY': 200, 'LOCATION': 351, 'EVENT': 175, 'LANGUAGE': 53}  
+    -   This new serialized DocBin 'dev.spacy' contains the following number of entity tags: {'PERSON': 175, 'NORP': 49, 'ORGANIZATION': 298, 'CARDINAL': 226, 'GPE': 193, 'DATE': 163, 'LOCATION': 27, 'FACILITY': 21, 'WORK OF ART': 46, 'TIME': 15, 'PRODUCT': 72, 'MONEY': 76, 'PERCENT': 12, 'ORDINAL': 11, 'QUANTITY': 22, 'LANGUAGE': 56, 'LAW': 18, 'EVENT': 17}
+    -   This new serialized DocBin 'test.spacy' contains the following number of entity tags: {'PERSON': 191, 'NORP': 41, 'CARDINAL': 168, 'QUANTITY': 28, 'FACILITY': 25, 'TIME': 18, 'ORGANIZATION': 249, 'DATE': 182, 'ORDINAL': 11, 'GPE': 135, 'MONEY': 72, 'WORK OF ART': 38, 'LOCATION': 46, 'EVENT': 19, 'LAW': 17, 'PRODUCT': 57, 'PERCENT': 13, 'LANGUAGE': 17}
+```bash
+#python src/data_assessment/n_tags_in_partition.py
+# NOW DONE IN OTHER SCRIPT
+
 ```
 
 - **Get DaNE**
@@ -852,9 +872,80 @@ python src/merge_dane.py
 #src/data_assessment/interrater_reliability/interrater_reliability_final.ipynb
 ```
 
+- **Train new models**
+1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
+2. Insert SSH-key *gold-multi-training/ucloud_setup/key_for_ucloud.txt*
+3. In VSCODE, add new SSH under remote. Write the following but fill out UCloud instance IP: *ssh -i /Users/emiltrencknerjessen/Desktop/priv/DANSK-gold-NER/gold-multi-training/ucloud_setup/key_file <ucloud@xxx.xxx.xx.xxx>*
+4. Add to first recommended
+5. Reload remote
+6. Connect in current window
+7. Run below bash lines
+```bash
+git clone https://github.com/emiltj/DaCy-3.0.0.git
+cd DaCy-3.0.0/
+bash src/server_dependencies.sh
+python3 -m venv v_env_training
+source v_env_training/bin/activate
+pip install wheel==0.38.4 # no version works
+pip install numpy==1.23.3
+pip install spacy==3.5.0 # no version works
+#pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
+pip install spacy-transformers==1.1.2
+pip install torch==1.13.1 # no version works
+pip install spacy[cuda101] # no idea about version? but version from 30 Jan 2023 works
+pip install huggingface==0.0.1 # no version works
+pip install spacy-huggingface-hub==0.0.8 #no version works
+pip install wandb==0.13.9 # no version works
+pip install spacy-lookups-data
+wandb login # insert API-key from https://wandb.ai/settings
+huggingface-cli login # insert token (WRITE) from https://huggingface.co/settings/tokens
+
+# Transfer data to "assets" from https://sciencedata.dk/index.php/apps/files/?dir=%2Fdata (- DaNE is with --merge-subtokens -n 10)
+
+To-do list:
+    - The set_values_as_missing is the thing that is making things not-work. Try without, and only on the NER to see if it can run. See OneNote "next meeting" for valuable information
+    - Fill and fix set_values_as_missing.py (https://github.com/explosion/spaCy/discussions/12307).
+    - Try out the commands from the top, locally BUT REMEMBER TO DEACTIVATE CONDA
+    - Clean up project.yml and fix the last
+    - Try training locally with small models and low epochs, etc.
+    - When finished making commands work, train models
+    - Make error analysis using interrrater reliability script
+
+Add til project.yml at man evaluater på dev set, både den for NER, men også de andre tasks. Så jeg kan tracke perfomance der også. Skal IKKE tracke performance på train settet, som jeg højst sandsynligt gør på wandb
+
 # Go through: https://github.com/explosion/spaCy/discussions/12307 
 
 
+
+
+CPU
+# NER alone
+## DANSK not set to missing -> Working
+python -m spacy train configs/cpu_ner_config.cfg --output test_models --gpu-id -1 --paths.train assets/dansk_train.spacy --paths.dev assets/dansk_dev.spacy --nlp.lang=da
+
+## DANSK set to missing -> Working
+python -m spacy train configs/cpu_ner_config.cfg --output test_models --gpu-id -1 --paths.train corpus/dansk_train.spacy --paths.dev corpus/dansk_dev.spacy --nlp.lang=da
+
+
+# The REST alone
+## DaNE not set to missing -> Working
+python -m spacy train configs/cpu_not_ner_all_config.cfg --output test_models --gpu-id -1 --paths.train assets/dane_train.spacy --paths.dev assets/dane_dev.spacy --nlp.lang=da
+
+## DaNE set to missing -> Working
+python -m spacy train configs/cpu_not_ner_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/dane_train.spacy --paths.dev corpus/dane_dev.spacy --nlp.lang=da
+
+
+# NER and the REST, SET to missing + dev set also a the merged 
+# -> NOT working (all working except DEP_UAS and DEP_LAS, they remain 0 regardless, and ents_f seem to not increase to or above ~30 and score seems to not increase much either)
+python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dev.spacy --nlp.lang=da
+
+# NER and the REST, SET to missing + dev set only NER
+# NOT working (low performance on ents_f)
+python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dansk_dev.spacy --nlp.lang=da
+
+# NER and the REST, SET to missing + dev set only DaNE
+# NOT working (poor performance on all parameters)
+python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dane_dev.spacy --nlp.lang=da
 
 
 
