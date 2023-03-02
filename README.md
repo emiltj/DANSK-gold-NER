@@ -560,28 +560,28 @@ python src/predict_single/predict_rater_2-9.py
 - **Assess agreement between rater and model**
     - Make assessment fine-grained, and assess for each type of ent, in prodigy using the review recipe
     For rater 3:
-    Cases where ents are same between predicted and model: 638
-    Cases where ents are NOT same between preds and model: 888
+    Docs where ents are same between predicted and model: 638
+    Docs where ents are NOT same between preds and model: 888
     For rater 4:
-    Cases where ents are same between predicted and model: 1114
-    Cases where ents are NOT same between preds and model: 1363
+    Docs where ents are same between predicted and model: 1114
+    Docs where ents are NOT same between preds and model: 1363
     For rater 5:
-    Cases where ents are same between predicted and model: 422
-    Cases where ents are NOT same between preds and model: 980
+    Docs where ents are same between predicted and model: 422
+    Docs where ents are NOT same between preds and model: 980
     For rater 6:
-    Cases where ents are same between predicted and model: 1046
-    Cases where ents are NOT same between preds and model: 1213
+    Docs where ents are same between predicted and model: 1046
+    Docs where ents are NOT same between preds and model: 1213
     For rater 7:
-    Cases where ents are same between predicted and model: 754
-    Cases where ents are NOT same between preds and model: 1148
+    Docs where ents are same between predicted and model: 754
+    Docs where ents are NOT same between preds and model: 1148
     For rater 8:
-    Cases where ents are same between predicted and model: 622
-    Cases where ents are NOT same between preds and model: 1076
+    Docs where ents are same between predicted and model: 622
+    Docs where ents are NOT same between preds and model: 1076
     For rater 9:
-    Cases where ents are same between predicted and model: 906
-    Cases where ents are NOT same between preds and model: 1203
-    Total cases where ents are same 5502
-    Total cases where ents are NOT same 7871
+    Docs where ents are same between predicted and model: 906
+    Docs where ents are NOT same between preds and model: 1203
+    Total docs where ents are same 5502
+    Total docs where ents are NOT same 7871
 ```bash
 # Go through script manually:
 # src/data_assessment/model_and_raters_agreement.ipynb
@@ -823,15 +823,7 @@ rm -rf data/full/gold/labels
 ```
 
 - **Assess number of tags in each split**
-#    - Train: {'ORGANIZATION': 1959, 'GPE': 1284, 'DATE': 1406, 'FACILITY': 195, 'CARDINAL': 1718, 'TIME': 180, 'PRODUCT': 598, 'PERSON': 1698, 'WORK OF ART': 322, 'LOCATION': 315, 'NORP': 374, 'QUANTITY': 235, 'PERCENT': 113, 'EVENT': 155, 'LANGUAGE': 64, 'LAW': 141, 'ORDINAL': 99, 'MONEY': 550}
-
-
-#    - Dev: {'DATE': 183, 'FACILITY': 22, 'CARDINAL': 172, 'GPE': 172, 'ORGANIZATION': 293, 'TIME': 18, 'MONEY': 80, 'PERSON': 205, 'EVENT': 17, 'NORP': 60, 'LANGUAGE': 4, 'LOCATION': 63, 'WORK OF ART': 54, 'ORDINAL': 19, 'QUANTITY': 27, 'PERCENT': 18, 'LAW': 21, 'PRODUCT': 83}
-
-
-#    - Test: {'ORGANIZATION': 255, 'WORK OF ART': 43, 'TIME': 20, 'LOCATION': 46, 'GPE': 148, 'PERSON': 230, 'CARDINAL': 206, 'DATE': 167, 'FACILITY': 29, 'ORDINAL': 9, 'MONEY': 84, 'PERCENT': 17, 'NORP': 61, 'QUANTITY': 30, 'EVENT': 39, 'LAW': 21, 'LANGUAGE': 58, 'PRODUCT': 82}
-
-    - Other script split:
+    - Other repo script split:
 
     -   This new serialized DocBin 'train.spacy' contains the following number of entity tags: {'GPE': 1276, 'DATE': 1411, 'NORP': 405, 'QUANTITY': 242, 'CARDINAL': 1702, 'TIME': 185, 'WORK OF ART': 335, 'ORGANIZATION': 1960, 'PRODUCT': 634, 'PERSON': 1767, 'ORDINAL': 105, 'PERCENT': 123, 'LAW': 148, 'MONEY': 566, 'FACILITY': 200, 'LOCATION': 351, 'EVENT': 175, 'LANGUAGE': 53}  
     -   This new serialized DocBin 'dev.spacy' contains the following number of entity tags: {'PERSON': 175, 'NORP': 49, 'ORGANIZATION': 298, 'CARDINAL': 226, 'GPE': 193, 'DATE': 163, 'LOCATION': 27, 'FACILITY': 21, 'WORK OF ART': 46, 'TIME': 15, 'PRODUCT': 72, 'MONEY': 76, 'PERCENT': 12, 'ORDINAL': 11, 'QUANTITY': 22, 'LANGUAGE': 56, 'LAW': 18, 'EVENT': 17}
@@ -842,7 +834,7 @@ rm -rf data/full/gold/labels
 
 ```
 
-- **Get DaNE**
+<!-- - **Get DaNE**
     - Creates in folders:
         - data/dane/dane_train.conllu
         - data/dane/dane_dev.conllu
@@ -857,20 +849,27 @@ python -m spacy convert data/dane/dane_dev.conllu data/dane/ --converter conllu 
 python -m spacy convert data/dane/dane_train.conllu data/dane/ --converter conllu --merge-subtokens -n 10
 python -m spacy convert data/dane/dane_test.conllu data/dane/ --converter conllu --merge-subtokens -n 10
 python src/merge_dane.py
-```
+``` -->
 
 - **Upload to sciencedata.dk
 ```bash
 # Manually
-````
+```
 
-
-# GOTTEN TO HERE
+# Gotten to here in the writing of relevant information for the Thesis Google Docs
 
 - **Assess interrater reliability of model and annotators**
 ```bash
 #src/data_assessment/interrater_reliability/interrater_reliability_final.ipynb
 ```
+
+- **Choose models for training for final model**
+    - Use  https://scandeval.github.io/nlu-benchmark/
+
+- **Create a new repo with the training for the final models which is to be implemented in DaCy repo**
+    - See "https://github.com/emiltj/DaCy-3.0.0"
+
+
 
 - **Train new models**
 1. Open *https://cloud.sdu.dk/app/jobs/create?app=cuda-jupyter-ubuntu-aau&version=20.04*
@@ -884,6 +883,8 @@ python src/merge_dane.py
 git clone https://github.com/emiltj/DaCy-3.0.0.git
 cd DaCy-3.0.0/
 bash src/server_dependencies.sh
+```
+```bash
 python3 -m venv v_env_training
 source v_env_training/bin/activate
 pip install wheel==0.38.4 # no version works
@@ -899,53 +900,57 @@ pip install wandb==0.13.9 # no version works
 pip install spacy-lookups-data
 wandb login # insert API-key from https://wandb.ai/settings
 huggingface-cli login # insert token (WRITE) from https://huggingface.co/settings/tokens
-
 # Transfer data to "assets" from https://sciencedata.dk/index.php/apps/files/?dir=%2Fdata (- DaNE is with --merge-subtokens -n 10)
+```
+```bash
+python -m spacy project run all_models_train_eval_pack_publ
+```
 
-To-do list:
-    - The set_values_as_missing is the thing that is making things not-work. Try without, and only on the NER to see if it can run. See OneNote "next meeting" for valuable information
-    - Fill and fix set_values_as_missing.py (https://github.com/explosion/spaCy/discussions/12307).
-    - Try out the commands from the top, locally BUT REMEMBER TO DEACTIVATE CONDA
-    - Clean up project.yml and fix the last
-    - Try training locally with small models and low epochs, etc.
-    - When finished making commands work, train models
-    - Make error analysis using interrrater reliability script
+- **Export test set and install new models locally**
+```bash
+# Do manually
+```
 
-Add til project.yml at man evaluater på dev set, både den for NER, men også de andre tasks. Så jeg kan tracke perfomance der også. Skal IKKE tracke performance på train settet, som jeg højst sandsynligt gør på wandb
-
-# Go through: https://github.com/explosion/spaCy/discussions/12307 
-
-
-
-
-CPU
-# NER alone
-## DANSK not set to missing -> Working
-python -m spacy train configs/cpu_ner_config.cfg --output test_models --gpu-id -1 --paths.train assets/dansk_train.spacy --paths.dev assets/dansk_dev.spacy --nlp.lang=da
-
-## DANSK set to missing -> Working
-python -m spacy train configs/cpu_ner_config.cfg --output test_models --gpu-id -1 --paths.train corpus/dansk_train.spacy --paths.dev corpus/dansk_dev.spacy --nlp.lang=da
-
-
-# The REST alone
-## DaNE not set to missing -> Working
-python -m spacy train configs/cpu_not_ner_all_config.cfg --output test_models --gpu-id -1 --paths.train assets/dane_train.spacy --paths.dev assets/dane_dev.spacy --nlp.lang=da
-
-## DaNE set to missing -> Working
-python -m spacy train configs/cpu_not_ner_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/dane_train.spacy --paths.dev corpus/dane_dev.spacy --nlp.lang=da
+- **Get descriptive stats on the final dataset** 
+    - For these 4 partitions: dansk (full), for dansk_train, dansk_dev, dansk_test:
+        - N_docs 
+        - N_tokens
+        - N_docs w/ NE
+        - N_ents
+        - N_ents for each ent type
+        - percentage of ent.texts not present in train (only for dev + test)
+        - N_ents + N_
+    - For each partition in DANSKet a count of n_docs, n_ents(from each group) in each domain, before starting the final evaluation**
+```bash
+# Yet to be implemented
+```
 
 
-# NER and the REST, SET to missing + dev set also a the merged 
-# -> NOT working (all working except DEP_UAS and DEP_LAS, they remain 0 regardless, and ents_f seem to not increase to or above ~30 and score seems to not increase much either)
-python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dev.spacy --nlp.lang=da
+- **Run final evaluation of models on the DANSK testdata**
+    - Include "interrater reliability"
+    - Include a loop which does the same for docs within each domain, so I also know performance for each domain
+```bash
+# src/final_eval/test_set_evaluation.ipynb
+```
 
-# NER and the REST, SET to missing + dev set only NER
-# NOT working (low performance on ents_f)
-python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dansk_dev.spacy --nlp.lang=da
+- **Consider adding additional test sets with Augmenty (see script in v2.00 repo)**
+```bash
+# Probably don't do it
+```
 
-# NER and the REST, SET to missing + dev set only DaNE
-# NOT working (poor performance on all parameters)
-python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -1 --paths.train corpus/train.spacy --paths.dev corpus/dane_dev.spacy --nlp.lang=da
+- **Publish data**
+    - Either on:
+        - Non-public website (sciencedata.dk)
+        - Public website (somewhere else?)
+
+- **Publish model under the organization "CHCAA"**
+    - Confer with Kenneth first
+
+- **Update DaCy repo with new info**
+    - Confer with Kenneth, but probably:
+        - create fork
+        - add my content
+        - create PR on DaCy
 
 
 
@@ -953,52 +958,14 @@ python -m spacy train configs/cpu_all_config.cfg --output test_models --gpu-id -
 
 
 
-Vigtig info fra møde m. Kenneth:
-	- Når jeg er færdig med DANSK, lav da interrater reliability test igen, men denne gange også med "the true values" fra datasættet. Brug dette i paperet som en måde hvorpå jeg kan validere datasættet (hvis der er høj interrater reliability). Hvis den er lav, få da Kenneth, Rebekah eller en uvildig til at gennemgå nogle og se uenigheden dér.
-	- Lav post på spaCy forum: Hvordan håndterer spaCy training missing values? Jeg har 2 datasæt, hvoraf den ene indeholder NER tags og den anden indeholder POS og Dependency Parsing. Kan jeg merge dette data og træne uden at NER komponenten bliver opdateret i tilfælde af batches med data uden NER? Og vice versa? Og hvordan sikrer jeg mig at spacy train håndterer det som "missing value" og ikke bare som om at der ER tagget, men at der ikke var nogen tags? https://github.com/explosion/spaCy/discussions/12307 
-	- Til den endelige træning, brug da følgende modeller (valgt ud fra https://scandeval.github.io/nlu-benchmark/):
-		○ Jonfd-nordic (i stedet for ælectra)
-		○ Nb-scandi (i stedet for DaBERT)
-		○ Dfm-bert-large (i stedet for XLM-R). Alternativt xlm-r, hvis jeg inkluderer ontonotes engelsk i træning også.
-	- Til den endelige træning, merge DDT med DANSK, men fjern al NER fra DDT, således at det er missing values under træningen.
-	- Til den endelige træning, overvej at lægge engelsk ontonotes ind også
-    - Til den endelige træning, opskalér da DDT, så det ikke fylder for lidt
-	- Til den endelige træning, lav da en fork af DaCy med en ny mappe under "training", som her er lavet i helt samme stil som kenneths sidste.
-	- Til den endelige træning, lav da en "final-model" og en "final-model-no-test". No-test versionen kan bruges til at replikere, mens den anden kan bruges i praksis. Hvis for doven, lav da kun en "final-model-no-test"
-	- Til evaluering af performance på testsættet, overvej da at bruge flere evalueringsmetoder, vha. "scorer"
+
+
+Til evaluering af performance på testsættet, overvej da at bruge flere evalueringsmetoder, vha. "scorer"
 	- DANSK behøver ikke udgives før DaCy kan trænes på det (unpublished dataset yet to be published)
 	- DANSK kan udgives på et hemmeligt datascience link til specialet, hvis det skulle være nødvendigt
     - DaCy behøves i princippet ikke udgives helt til specialet, men kan ligge på en ny branch
 
 
-
-
-
-
-
-
-
-
-
-- **Calculate how many tags there are of each type**
-```bash
-?????
-```
-
-- **If few of some tags, add tags**
-```bash
-# Empty unless few tags of some of them
-```
-
-- **Train a new model**
-
-- **Use model to predict on all data**
-
-- **Review cases where model and data disagrees**
-
-- **Use newly reviewed data to train a new model**
-
-- **Evaluate performance, and do qualitative error analysis**
 
 - **Nice to do, not need to do, depends also on performance**
     - Predict on bad labels (e.g. product and language) on existing dataset, and subsequently use prodigy review on only these docs
@@ -1008,11 +975,3 @@ Vigtig info fra møde m. Kenneth:
     - Do it using one of the following approaches:
         - Using Spancategorizer
         - Use the model to predict on parts of the DANSK dataset. And then go through these faulty classifications and see whether the classification is wrong, or whether the labeling is wrong. Go through the wrong labeling and fix it. Iterate this processUse the models' wrong predictions
-
-- **Gain access to Huggingface account centre-for-humanities-computing**
-
-- **Train a NER model on the gold-dansk and package it**
-    - Everything must be done on UCloud as packaging can't be done locally
-    - Ensure that relevant information on Weights and Biases (wandb) is saved so I can use for report. 
-    https://docs.wandb.ai/guides/integrations/spacy
-    - Packaging to centre-for-humanities-computing
