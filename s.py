@@ -1,10 +1,13 @@
 import spacy
+from spacy.tokens import DocBin
 from zshot import PipelineConfig, displacy
 from zshot.linker import LinkerRegen
 from zshot.mentions_extractor import MentionsExtractorSpacy
 from zshot.utils.data_models import Entity
 
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("da_core_news_sm")
+dansk_docs = list(DocBin().from_disk("data/full/gold/train.spacy").get_docs(nlp.vocab))
+len(dansk_docs)
 
 # zero shot definition of entities
 nlp_config = PipelineConfig(
@@ -120,3 +123,21 @@ preds = {
 
 l.keys()
 l["versions"][0]
+
+
+import spacy
+from spacy.tokens import DocBin, Doc
+
+nlp = spacy.blank("da")
+
+text = "Dette er en tekst"
+doc = nlp(text)
+
+t = doc.to_json()
+type(t)
+
+t["meta"] = "dagw"
+t
+doc2 = Doc(nlp.vocab).from_json(t)
+
+doc2.to_json()

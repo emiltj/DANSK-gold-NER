@@ -10,6 +10,7 @@ raters = [3, 4, 5, 6, 7, 8, 9]
 nlp = spacy.blank("da")
 print("Loading model ...")
 nlp2 = spacy.load("da_multi_dupli_rater_1_onto")
+# nlp3 = spacy.load("da_dacy_test_DANSK_ner")
 print("Model loaded, predicting on raters")
 
 # For each rater

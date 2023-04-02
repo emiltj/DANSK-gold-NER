@@ -296,6 +296,7 @@ python -m spacy train configs/config_trf.cfg --paths.train datasets/onto_and_gol
 python -m spacy evaluate models/multi-dupli-and-onto/model-best/ datasets/gold-multi-dev.spacy --output metrics/multi-dupli-and-onto.json --gpu-id 0
 ```
 
+
 - **Assess which model is best, using wandb and metrics of performance from spacy evaluate**
     - https://wandb.ai/emil-tj/gold-multi-train
     - Model chosen was multi-dupli-onto
@@ -801,33 +802,8 @@ rm data/full/gold/config.cfg
 rm -rf data/full/gold/labels
 ```
 
-- **Split dansk up into train, dev, test**'
-    - Creates in folders:
-        - data/full/gold/dansk_train.spacy (.8 of full)
-        - data/full/gold/dansk_dev.spacy (.10 of full)
-        - data/full/gold/dansk_test.spacy (.10 of full)
-    - Creates in db:
-        - dansk_test
-```bash
-prodigy data-to-spacy data/full/gold/ --ner gold --lang "da" --eval-split .2
-mv data/full/gold/train.spacy data/full/gold/dansk_train.spacy
-mv data/full/gold/test.spacy data/full/gold/dansk_test.spacy
-python ./src/preprocessing/load_docbin_as_jsonl.py data/full/gold/dansk_test.spacy blank:da --ner > data/full/gold/dansk_test.jsonl
-prodigy db-in dansk_t data/full/gold/dansk_test.jsonl
-prodigy data-to-spacy data/full/gold/ --ner dansk_t --lang "da" --eval-split .5
-mv data/full/gold/test.spacy data/full/gold/dansk_test.spacy
-mv data/full/gold/train.spacy data/full/gold/dansk_dev.spacy
-
-rm data/full/gold/config.cfg
-rm -rf data/full/gold/labels
-```
-
 - **Assess number of tags in each split**
-    - Other repo script split:
 
-    -   This new serialized DocBin 'train.spacy' contains the following number of entity tags: {'GPE': 1276, 'DATE': 1411, 'NORP': 405, 'QUANTITY': 242, 'CARDINAL': 1702, 'TIME': 185, 'WORK OF ART': 335, 'ORGANIZATION': 1960, 'PRODUCT': 634, 'PERSON': 1767, 'ORDINAL': 105, 'PERCENT': 123, 'LAW': 148, 'MONEY': 566, 'FACILITY': 200, 'LOCATION': 351, 'EVENT': 175, 'LANGUAGE': 53}  
-    -   This new serialized DocBin 'dev.spacy' contains the following number of entity tags: {'PERSON': 175, 'NORP': 49, 'ORGANIZATION': 298, 'CARDINAL': 226, 'GPE': 193, 'DATE': 163, 'LOCATION': 27, 'FACILITY': 21, 'WORK OF ART': 46, 'TIME': 15, 'PRODUCT': 72, 'MONEY': 76, 'PERCENT': 12, 'ORDINAL': 11, 'QUANTITY': 22, 'LANGUAGE': 56, 'LAW': 18, 'EVENT': 17}
-    -   This new serialized DocBin 'test.spacy' contains the following number of entity tags: {'PERSON': 191, 'NORP': 41, 'CARDINAL': 168, 'QUANTITY': 28, 'FACILITY': 25, 'TIME': 18, 'ORGANIZATION': 249, 'DATE': 182, 'ORDINAL': 11, 'GPE': 135, 'MONEY': 72, 'WORK OF ART': 38, 'LOCATION': 46, 'EVENT': 19, 'LAW': 17, 'PRODUCT': 57, 'PERCENT': 13, 'LANGUAGE': 17}
 ```bash
 #python src/data_assessment/n_tags_in_partition.py
 # NOW DONE IN OTHER SCRIPT
@@ -869,6 +845,9 @@ python src/merge_dane.py
 - **Create a new repo with the training for the final models which is to be implemented in DaCy repo**
     - See "https://github.com/emiltj/DaCy-3.0.0"
 
+# Gotten to here in execution
+
+# Gotten to here in writing what should be done
 
 
 - **Train new models**
@@ -880,35 +859,52 @@ python src/merge_dane.py
 6. Connect in current window
 7. Run below bash lines
 ```bash
-git clone https://github.com/emiltj/DaCy-3.0.0.git
-cd DaCy-3.0.0/
-bash src/server_dependencies.sh
+git clone https://github.com/emiltj/DaCy.git
+cd DaCy/
+bash training/ner_fine_grained/server_setup.sh
 ```
 ```bash
-python3 -m venv v_env_training
-source v_env_training/bin/activate
-pip install wheel==0.38.4 # no version works
-pip install numpy==1.23.3
-pip install spacy==3.5.0 # no version works
-#pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
-pip install spacy-transformers==1.1.2
-pip install torch==1.13.1 # no version works
-pip install spacy[cuda101] # no idea about version? but version from 30 Jan 2023 works
-pip install huggingface==0.0.1 # no version works
-pip install spacy-huggingface-hub==0.0.8 #no version works
-pip install wandb==0.13.9 # no version works
-pip install spacy-lookups-data
-wandb login # insert API-key from https://wandb.ai/settings
-huggingface-cli login # insert token (WRITE) from https://huggingface.co/settings/tokens
-# Transfer data to "assets" from https://sciencedata.dk/index.php/apps/files/?dir=%2Fdata (- DaNE is with --merge-subtokens -n 10)
-```
-```bash
+cd DaCy/training/ner_fine_grained
+source environment_setup.sh
+source training_env/bin/activate
+python -m spacy project run prepare_data
 python -m spacy project run all_models_train_eval_pack_publ
 ```
 
+```bash
+python3 -m venv training_env
+source training_env/bin/activate
+pip install -r requirements.txt
+pip install spacy[cuda]
+python3 -m spacy project run prepare_data
+python3 -m spacy project run all_models_train_eval_pack_publ
+```
+
+
+
+python3 -m venv training_env
+source training_env/bin/activate
+# pip install wheel==0.38.4 # no version works
+# pip install numpy==1.23.3
+# pip install spacy==3.5.0 # no version works
+# #pip install spacy-transformers # below version has dependency of transformers that matches the dependency of spacy-huggingface-hub
+# pip install spacy-transformers==1.1.2
+# pip install torch==1.13.1 # no version works
+# pip install spacy[cuda101] # no idea about version? but version from 30 Jan 2023 works
+# pip install huggingface==0.0.1 # no version works
+# pip install spacy-huggingface-hub==0.0.8 #no version works
+# pip install wandb==0.13.9 # no version works
+# wandb login
+# huggingface-cli login
+
+
+
 - **Export test set and install new models locally**
 ```bash
-# Do manually
+# Do manually export of test set
+pip install https://huggingface.co/emiltj/da_dacy_small_DANSK_ner/resolve/main/da_dacy_small_DANSK_ner-any-py3-none-any.whl
+pip install https://huggingface.co/emiltj/da_dacy_medium_DANSK_ner/resolve/main/da_dacy_medium_DANSK_ner-any-py3-none-any.whl
+pip install https://huggingface.co/emiltj/da_dacy_large_DANSK_ner/resolve/main/da_dacy_large_DANSK_ner-any-py3-none-any.whl
 ```
 
 - **Get descriptive stats on the final dataset** 
@@ -926,17 +922,42 @@ python -m spacy project run all_models_train_eval_pack_publ
 ```
 
 
-- **Run final evaluation of models on the DANSK testdata**
-    - Include "interrater reliability"
-    - Include a loop which does the same for docs within each domain, so I also know performance for each domain
+- **Run interrater reliability script on predictions vs. gold-standard**
+    - Must also do it for within each domain
+    - Only on testset
+    - After getting the metrics, save the numbers, so I can make heatmaps in R
+    - Save all as .png files
 ```bash
-# src/final_eval/test_set_evaluation.ipynb
+# Yet to be implemented, Python
+# Yet to be implemented, RStudio
 ```
 
-- **Consider adding additional test sets with Augmenty (see script in v2.00 repo)**
+- **Run in-depth evaluation of performance on test**
+    - Include:
+        - Within each domain
+        - NERVALUATE (maybe/maybe not within each domain)
+            - https://github.com/MantisAI/nervaluate
+            - https://www.davidsbatista.net/blog/2018/05/09/Named_Entity_Evaluation/
+            - https://pypi.org/project/nervaluate/
+    - Maybe (?) Save all as tables(?)
 ```bash
-# Probably don't do it
+# Yet to be implemented
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - **Publish data**
     - Either on:
@@ -952,22 +973,8 @@ python -m spacy project run all_models_train_eval_pack_publ
         - add my content
         - create PR on DaCy
 
-
-
-
-
-
-
-
-
-Til evaluering af performance på testsættet, overvej da at bruge flere evalueringsmetoder, vha. "scorer"
-	- DANSK behøver ikke udgives før DaCy kan trænes på det (unpublished dataset yet to be published)
-	- DANSK kan udgives på et hemmeligt datascience link til specialet, hvis det skulle være nødvendigt
-    - DaCy behøves i princippet ikke udgives helt til specialet, men kan ligge på en ny branch
-
-
-
 - **Nice to do, not need to do, depends also on performance**
+    - Consider adding additional test sets with Augmenty (see script in v2.00 repo)
     - Predict on bad labels (e.g. product and language) on existing dataset, and subsequently use prodigy review on only these docs
         - Make predictions using Zero shot predictions (Zshot - https://spacy.io/universe/project/Zshot)
         - Make predictions using and English trained model (same style as: gold-multi-training/datasets/lang_product_predict_gold_multi_rater_1.py)
@@ -975,3 +982,8 @@ Til evaluering af performance på testsættet, overvej da at bruge flere evaluer
     - Do it using one of the following approaches:
         - Using Spancategorizer
         - Use the model to predict on parts of the DANSK dataset. And then go through these faulty classifications and see whether the classification is wrong, or whether the labeling is wrong. Go through the wrong labeling and fix it. Iterate this processUse the models' wrong predictions
+
+
+
+
+prodigy review test rater_1_multi_unprocessed,rater_3_multi_unprocessed,rater_4_multi_unprocessed,rater_5_multi_unprocessed,rater_6_multi_unprocessed,rater_7_multi_unprocessed,rater_8_multi_unprocessed,rater_9_multi_unprocessed --label PERSON,NORP,FACILITY,ORGANIZATION,LOCATION,EVENT,LAW,DATE,TIME,PERCENT,MONEY,QUANTITY,ORDINAL,CARDINAL,GPE,WORK\ OF\ ART,LANGUAGE,PRODUCT -S -A
